@@ -724,7 +724,6 @@
             loadData();
             updateDisplay();
             generateDailyTasks();
-            updateStreak(); // Kiểm tra streak ngay khi khởi động
             showRandomNote();
         }
 
@@ -733,8 +732,10 @@
             if (savedData) {
                 data = { ...data, ...JSON.parse(savedData) };
             } else {
-                // Khởi tạo dữ liệu mặc định nếu chưa có
                 data.dailyTasks = {};
+            }
+            if (data.lastStudyDate && typeof data.lastStudyDate !== 'string') {
+                data.lastStudyDate = new Date(data.lastStudyDate).toDateString();
             }
         }
 
@@ -747,7 +748,6 @@
             document.getElementById('studyStreak').textContent = data.studyStreak;
             document.getElementById('totalHours').textContent = Math.floor(data.totalHours * 10) / 10;
             
-            // Tính số ngày còn lại từ ngày hiện tại đến 31/1/2026
             const today = new Date();
             const endDate = new Date('2026-01-31');
             const timeDiff = endDate - today;
@@ -782,48 +782,36 @@
             const todayStr = today.toDateString();
             const yesterday = new Date(today - 24 * 60 * 60 * 1000).toDateString();
             
-            if (data.lastStudyDate === null) {
+            if (!data.lastStudyDate) {
                 data.studyStreak = 1; // Bắt đầu streak nếu chưa có ngày học nào
-            } else if (data.lastStudyDate !== todayStr) {
-                if (data.lastStudyDate === yesterday) {
-                    data.studyStreak++; // Tăng streak nếu học hôm qua
-                } else {
-                    data.studyStreak = 1; // Reset streak nếu bỏ lỡ ngày
-                }
+                data.lastStudyDate = todayStr;
+            } else if (data.lastStudyDate !== todayStr && data.lastStudyDate === yesterday) {
+                data.studyStreak++; // Tăng streak nếu học hôm qua
+                data.lastStudyDate = todayStr;
+            } else if (data.lastStudyDate !== todayStr && data.lastStudyDate !== yesterday) {
+                data.studyStreak = 1; // Reset streak nếu bỏ lỡ ngày
+                data.lastStudyDate = todayStr;
             }
-            
-            data.lastStudyDate = todayStr; // Cập nhật ngày học mới
             saveData();
         }
 
         function generateDailyTasks() {
             const today = new Date();
             const dayOfWeek = today.getDay();
-            const currentMonth = today.getMonth() + 1; // getMonth() trả về 0-11, cộng 1 để thành 1-12
+            const currentMonth = today.getMonth() + 1;
             let phase = 1;
 
-            // Xác định giai đoạn dựa trên tháng
-            if (currentMonth >= 6 && currentMonth <= 7) {
-                phase = 1; // Giai đoạn 1: Tháng 6-7/2025
-            } else if (currentMonth >= 8 && currentMonth <= 9) {
-                phase = 2; // Giai đoạn 2: Tháng 8-9/2025
-            } else if (currentMonth >= 10 && currentMonth <= 11) {
-                phase = 3; // Giai đoạn 3: Tháng 10-11/2025
-            } else if (currentMonth >= 12 || currentMonth === 1) {
-                phase = 4; // Giai đoạn 4: Tháng 12/2025 - Tháng 1/2026
-            }
+            if (currentMonth >= 6 && currentMonth <= 7) phase = 1;
+            else if (currentMonth >= 8 && currentMonth <= 9) phase = 2;
+            else if (currentMonth >= 10 && currentMonth <= 11) phase = 3;
+            else if (currentMonth >= 12 || currentMonth === 1) phase = 4;
 
             let tasks = [];
-            if (dayOfWeek >= 1 && dayOfWeek <= 6) {
-                tasks = dailyTasksByPhase[phase].weekday[dayOfWeek] || [];
-            } else if (dayOfWeek === 0) {
-                tasks = dailyTasksByPhase[phase].weekend[0] || [];
-            }
+            if (dayOfWeek >= 1 && dayOfWeek <= 6) tasks = dailyTasksByPhase[phase].weekday[dayOfWeek] || [];
+            else if (dayOfWeek === 0) tasks = dailyTasksByPhase[phase].weekend[0] || [];
 
             const todayKey = today.toDateString();
-            if (!data.dailyTasks[todayKey]) {
-                data.dailyTasks[todayKey] = tasks.map(() => false);
-            }
+            if (!data.dailyTasks[todayKey]) data.dailyTasks[todayKey] = tasks.map(() => false);
 
             const container = document.getElementById('dailyTasks');
             container.innerHTML = `
@@ -847,44 +835,38 @@
             const taskText = checkbox.nextElementSibling;
             const taskTimeElement = taskText.nextElementSibling;
             const today = new Date();
-            const todayKey = today.toDateString();
+            const todayStr = today.toDateString();
             
-            if (!data.dailyTasks[todayKey] || !Array.isArray(data.dailyTasks[todayKey])) {
-                data.dailyTasks[todayKey] = [];
+            if (!data.dailyTasks[todayStr] || !Array.isArray(data.dailyTasks[todayStr])) {
+                data.dailyTasks[todayStr] = [];
             }
 
             if (checkbox.checked) {
                 taskText.classList.add('completed');
                 data.totalPoints += points;
 
-                // Tính giờ từ task.time
-                const timeStr = taskTimeElement.textContent.match(/\d+(?:\.\d+)?[hmp]/i)[0]; // Lấy phần số và đơn vị (h, m, p)
+                const timeStr = taskTimeElement.textContent.match(/\d+(?:\.\d+)?[hmp]/i)[0];
                 let hours = 0;
-                if (timeStr.includes('h')) {
-                    hours = parseFloat(timeStr.replace('h', ''));
-                } else if (timeStr.includes('p') || timeStr.includes('m')) {
-                    hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60; // Chuyển phút sang giờ
-                }
+                if (timeStr.includes('h')) hours = parseFloat(timeStr.replace('h', ''));
+                else if (timeStr.includes('p') || timeStr.includes('m')) hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60;
                 data.totalHours += hours;
 
-                data.dailyTasks[todayKey][taskIndex] = true;
-                updateStreak(); // Cập nhật streak khi hoàn thành nhiệm vụ
-                showNotification(`+${points} điểm! 🎉`);
+                data.dailyTasks[todayStr][taskIndex] = true;
+                if (!data.lastStudyDate || data.lastStudyDate !== todayStr) {
+                    updateStreak();
+                }
+                showNotification(`+${points} điểm! 🎉 Streak hiện tại: ${data.studyStreak}`);
             } else {
                 taskText.classList.remove('completed');
                 data.totalPoints = Math.max(0, data.totalPoints - points);
 
-                // Trừ giờ khi bỏ tick
                 const timeStr = taskTimeElement.textContent.match(/\d+(?:\.\d+)?[hmp]/i)[0];
                 let hours = 0;
-                if (timeStr.includes('h')) {
-                    hours = parseFloat(timeStr.replace('h', ''));
-                } else if (timeStr.includes('p') || timeStr.includes('m')) {
-                    hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60;
-                }
+                if (timeStr.includes('h')) hours = parseFloat(timeStr.replace('h', ''));
+                else if (timeStr.includes('p') || timeStr.includes('m')) hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60;
                 data.totalHours = Math.max(0, data.totalHours - hours);
 
-                data.dailyTasks[todayKey][taskIndex] = false;
+                data.dailyTasks[todayStr][taskIndex] = false;
             }
             
             saveData();
@@ -911,25 +893,13 @@
             achievements.forEach(achievement => {
                 if (!data.achievements.includes(achievement.id)) {
                     let earned = false;
-                    
                     switch(achievement.id) {
-                        case 'firstDay':
-                            earned = data.totalHours >= 1;
-                            break;
-                        case 'week1':
-                            earned = data.studyStreak >= 7;
-                            break;
-                        case 'grammar25':
-                            earned = data.books.grammar.completed >= data.books.grammar.total * 0.25;
-                            break;
-                        case 'vocab25':
-                            earned = data.books.vocab.completed >= data.books.vocab.total * 0.25;
-                            break;
-                        case 'month1':
-                            earned = data.totalHours >= 50;
-                            break;
+                        case 'firstDay': earned = data.totalHours >= 1; break;
+                        case 'week1': earned = data.studyStreak >= 7; break;
+                        case 'grammar25': earned = data.books.grammar.completed >= data.books.grammar.total * 0.25; break;
+                        case 'vocab25': earned = data.books.vocab.completed >= data.books.vocab.total * 0.25; break;
+                        case 'month1': earned = data.totalHours >= 50; break;
                     }
-                    
                     if (earned) {
                         data.achievements.push(achievement.id);
                         data.totalPoints += achievement.points;
@@ -938,7 +908,6 @@
                     }
                 }
             });
-            
             updateDisplay();
         }
 
@@ -957,11 +926,8 @@
                 z-index: 1000;
                 animation: slideIn 0.5s ease;
             `;
-            
             document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            setTimeout(() => notification.remove(), 3000);
         }
 
         function updateBookProgress(bookType) {
@@ -975,7 +941,6 @@
                 'speaking': 'IELTS Speaking A2+',
                 'writing': 'IELTS Writing A2+'
             };
-            
             document.getElementById('bookModalTitle').textContent = `📚 Cập nhật tiến độ - ${titleMap[bookType]}`;
             document.getElementById('unitsCompleted').value = data.books[bookType].completed;
             document.getElementById('unitsCompleted').max = data.books[bookType].total;
@@ -989,7 +954,6 @@
         function saveBookProgress() {
             const completed = parseInt(document.getElementById('unitsCompleted').value) || 0;
             const maxUnits = data.books[currentBook].total;
-            
             if (completed >= 0 && completed <= maxUnits) {
                 data.books[currentBook].completed = completed;
                 saveData();
@@ -1023,12 +987,9 @@
 
         window.onclick = function(event) {
             const modal = document.getElementById('bookModal');
-            if (event.target === modal) {
-                closeModal();
-            }
+            if (event.target === modal) closeModal();
         };
 
-        // Initialize app
         initApp();
     </script>
 </body>
