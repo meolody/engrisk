@@ -763,7 +763,7 @@ function home(){
  const qs=[["Làm 1 bài Từ vựng",d.sk.includes('V')],["Làm 1 bài Nghe, Đọc, Viết hoặc Nói",d.sk.some(k=>k!=='V')],["Kiếm 60 XP hôm nay",d.xp>=60]];
  $('#app').innerHTML=`
  <div class="top"><div class="toprow"><span class="lvl">Lv ${lv}</span><div class="xpbar" aria-label="${into} trên 100 XP"><i style="width:${into}%"></i></div><span class="streak">${S.streak} ngày liên tiếp</span></div></div>
- <div class="hero"><h1>Chào bạn, hôm nay học gì?</h1><p>Mỗi bài chỉ 5 câu, khoảng 5 phút. Đang ở chặng ${L}: band ${LV[L]}.</p></div>
+ <div class="hero"><h1>Chào bạn, hôm nay học gì?</h1><p>Chặng ${L} · band ${LV[L]}</p></div>
  <div class="mount">${mountain()}<p class="sub" style="margin:8px 0 0">Chặng ${L} · đã nhớ ${mL}/${wsL.length} từ của chặng · ${S.xp} XP · <button class="lnk" style="background:none;border:0;padding:0;color:var(--sun);font-weight:700" onclick="go('road')">Xem lộ trình →</button></p></div>
  <h2 class="sec">Nhiệm vụ hôm nay (+30 XP khi xong cả 3)</h2>
  <div class="daily">${qs.map(q=>`<div class="q-item ${q[1]?'done':''}"><span class="chk">${q[1]?'✓':''}</span>${q[0]}</div>`).join('')}</div>
@@ -772,9 +772,7 @@ function home(){
  <button class="card" style="--c:var(--bad);grid-column:1/-1;min-height:0" onclick="start('B',true)"><span class="ico">!</span><h3>Đấu Boss</h3><span class="sub">8 câu trộn đủ kỹ năng, XP nhân đôi</span></button></div>
  <h2 class="sec">Đổi gió</h2><div class="grid"><button class="card" style="--c:var(--cV)" onclick="go('games')"><h3>Trò chơi từ vựng</h3><span class="sub">Ghép cặp, đánh vần, tốc độ 60 giây</span></button><button class="card" style="--c:var(--cC)" onclick="go('talk')"><h3>Giao tiếp hằng ngày</h3><span class="sub">Hội thoại và cụm câu hay dùng</span></button><button class="card" style="--c:var(--cL)" onclick="go('media')"><h3>Phim & nhạc</h3><span class="sub">Hoạt hình, podcast, bài hát</span></button></div>
  <h2 class="sec">Huy hiệu</h2>
- <div class="badges">${BADGES.map(b=>`<span class="badge ${S.badges.includes(b[0])?'':'off'}">${b[1]}</span>`).join('')}</div>
- <p class="sub" style="margin-top:22px">Mẹo: chán thì đổi món. Xem 1 tập hoạt hình ở tab Phim & nhạc, chơi 1 trò, rồi làm 1 bài Nói. Tiến độ lưu ngay trên trình duyệt này.</p>
- <p class="sub" style="margin-top:14px;font-size:.8rem">Định nghĩa tiếng Anh lấy từ Princeton WordNet 3.0 (© 2006 Princeton University, dùng theo giấy phép WordNet: wordnet.princeton.edu/license-and-commercial-use). Định nghĩa chính thức đầy đủ xem tại Cambridge Dictionary qua link từng từ. Ví dụ, nghĩa tiếng Việt và hội thoại do app tự soạn.</p>`;
+ <div class="badges">${BADGES.map(b=>`<span class="badge ${S.badges.includes(b[0])?'':'off'}">${b[1]}</span>`).join('')}</div>`;
  toTop()}
 let Q=[],qi=0,ok=0,combo=0,sx=0,by={},mode='',locked=false,boss=false,ord=null,sp=null;
 function mcq(o){if(o.fixed)return Object.assign({kind:'mc'},o);
@@ -967,11 +965,11 @@ function exitS(){clearInterval(window.tmr);try{speechSynthesis.cancel()}catch(e)
 const TABS=[["home","⌂","Trang chủ"],["road","↗","Lộ trình"],["learn","Aa","Học theo chủ đề"],["games","★","Trò chơi"],["talk","☺","Giao tiếp"],["media","▶","Phim & nhạc"],["test","✓","Thi thử"],["dict","?","Từ điển"]];
 const MOB=["home","road","learn","media","test"];
 function shell(){
- $('#side').innerHTML=`<div class="brand"><i>IE</i>Leo band IELTS</div>${TABS.map(t=>`<button class="nav" id="nv-${t[0]}" onclick="go('${t[0]}')"><b>${t[1]}</b>${t[2]}</button>`).join('')}<div class="sidefoot">Tiến độ lưu trên trình duyệt này.</div>`;
+ $('#side').innerHTML=`<div class="brand"><i>IE</i>Leo band IELTS</div>${TABS.map(t=>`<button class="nav" id="nv-${t[0]}" onclick="go('${t[0]}')"><b>${t[1]}</b>${t[2]}</button>`).join('')}`;
  $('#tabbar').innerHTML=MOB.map(k=>{const t=TABS.find(x=>x[0]===k);return `<button id="tb-${k}" onclick="go('${k}')"><b>${t[1]}</b>${t[2].replace('Học theo chủ đề','Chủ đề')}</button>`}).join('');}
 function mark(k){document.body.classList.remove('insess');document.querySelectorAll('.nav,.tabbar button').forEach(b=>b.classList.toggle('on',b.id==='nv-'+k||b.id==='tb-'+k));window.ret=null;window.cur=k}
 function go(k){clearInterval(window.tmr);({home,road,learn,games,talk,media,test,dict})[k]();try{location.hash=k==='home'?'':k}catch(e){}}
-const ph=(h,p)=>`<div class="pagehead"><h1>${h}</h1>${p?`<p>${p}</p>`:''}</div>`;
+const ph=h=>`<div class="pagehead"><h1>${h}</h1></div>`;
 // ---- Học theo chủ đề ----
 function lvSeg(){const c=S.lv||1;return `<div class="seg" role="tablist">${[1,2,3,4,5].map(l=>`<button class="${c===l?'on':''}" onclick="S.lv=${l};save();learn()">Chặng ${l} · ${LV[l]}</button>`).join('')}</div>`}
 function mastered(ws){return ws.filter(v=>(S.box[v.w]||0)>=2).length}
@@ -1019,11 +1017,11 @@ function games(){mark('games');
 function talk(){mark('talk');
  $('#app').innerHTML=ph('Giao tiếp hằng ngày','Hội thoại đời thường cũng là chất liệu cho Listening Section 1 và Speaking Part 1.')+`<div class="grid">
  <button class="card" style="--c:var(--cC);grid-column:1/-1;min-height:0" onclick="start('C')"><span class="ico">☺</span><h3>Luyện hội thoại</h3><span class="sub">Nghe người kia nói, chọn câu đáp. ${DIALOGS.length} tình huống.</span></button></div>
- ${PHRASES.map((g,gi)=>`<div class="phgrp"><h3>${esc(g[0])}</h3><p class="sub" style="margin:2px 0 0">${esc(g[1])}</p>${g[2].map((p,pi)=>`<button class="ph" onclick="say(PHRASES[${gi}][2][${pi}][0],.8)"><div><b>${esc(p[0])}</b><span class="vi">${esc(p[1])}</span></div><span class="sp">▶</span></button>`).join('')}</div>`).join('')}`;toTop()}
+ ${PHRASES.map((g,gi)=>`<div class="phgrp"><h3>${esc(g[0])}</h3>${g[2].map((p,pi)=>`<button class="ph" onclick="say(PHRASES[${gi}][2][${pi}][0],.8)"><div><b>${esc(p[0])}</b><span class="vi">${esc(p[1])}</span></div><span class="sp">▶</span></button>`).join('')}</div>`).join('')}`;toTop()}
 // ---- Từ điển ----
 function dict(){mark('dict');
  $('#app').innerHTML=ph('Từ điển',`Tra nhanh trên Cambridge Dictionary, hoặc xem ${VOCAB.length} từ có trong app.`)+`<form class="dform" onsubmit="return lookup(event)"><input class="inp" id="dq" placeholder="Gõ một từ tiếng Anh..." aria-label="Từ cần tra" autocomplete="off" autocapitalize="off"><button class="btn" style="width:auto" type="submit">Tra</button></form><p id="dres" class="sub" style="margin:8px 0 0"></p>
- <input class="inp" id="flt" style="margin-top:16px" placeholder="Lọc danh sách từ trong app..." aria-label="Lọc từ" oninput="dlist()"><div class="stack" id="dl" style="margin-top:12px"></div>`;dlist();toTop()}
+ <input class="inp" id="flt" style="margin-top:16px" placeholder="Lọc danh sách từ trong app..." aria-label="Lọc từ" oninput="dlist()"><div class="stack" id="dl" style="margin-top:12px"></div><p class="sub" style="margin-top:20px;font-size:.75rem">Định nghĩa tiếng Anh: Princeton WordNet 3.0 © Princeton University.</p>`;dlist();toTop()}
 function dlist(){const f=($('#flt').value||'').toLowerCase().trim();
  const ws=VOCAB.filter(v=>!f||v.w.includes(f)||v.vi.toLowerCase().includes(f)).slice(0,80);
  $('#dl').innerHTML=ws.map(v=>`<div class="wcard"><div class="wt"><b>${esc(v.w)}</b> · ${esc(v.vi)}${DEF[v.w]?`<i>${esc(DEF[v.w])}</i>`:''}<span class="src">${esc(v.src)} · ${camLink(v.w,'Cambridge ↗')}</span></div></div>`).join('')+(ws.length===80?'<p class="sub">Gõ để lọc thêm…</p>':'')}
@@ -1069,8 +1067,7 @@ function media(){mark('media');
  `<h2 class="sec">Hoạt hình, phim & podcast</h2><div class="stack">${MEDIA.map((m,i)=>`<div class="media"><div class="mh"><span class="thumb" style="background:${m[6]}">▶</span><div><b>${esc(m[0])}</b><br><span class="pill">${esc(m[1])}</span> <span class="pill">${esc(m[2])}</span></div></div><span class="sub">${esc(m[3])}</span>
  ${m[5].map((t,j)=>`<label class="task"><input type="checkbox" onchange="mchk(${i})" id="mt${i}_${j}">${esc(t)}</label>`).join('')}
  <div class="row" style="margin-top:4px"><a class="btn ghost" style="text-align:center;text-decoration:none" href="${m[4]}" target="_blank" rel="noopener">Mở trên YouTube ↗</a><button class="btn" id="mc${i}" disabled onclick="claim('m${i}',25)">Nhận 25 XP</button></div></div>`).join('')}</div>
- <h2 class="sec">Học qua bài hát</h2><p class="sub">Lời bài hát có bản quyền nên app không chép lời. Bấm để mở bản có lời (lyrics video) trên YouTube.</p>
- <div class="media"><b>Nhiệm vụ mỗi bài hát</b>${SONG_TASKS.map(t=>`<span class="task">• ${esc(t)}</span>`).join('')}</div>
+ <h2 class="sec">Học qua bài hát</h2>
  <div class="tlist" style="margin-top:12px">${SONGS.map((s,i)=>`<div class="tcard"><h3>${esc(s[0])}</h3><span class="src">${esc(s[1])}</span><span class="sub">${esc(s[2])}</span><div class="row" style="margin-top:6px"><a class="btn ghost" style="text-align:center;text-decoration:none;padding:10px" href="${YT(s[0]+' '+s[1]+' lyrics')}" target="_blank" rel="noopener">Nghe ↗</a><button class="btn" style="padding:10px" onclick="claim('s${i}',15)">Xong +15</button></div></div>`).join('')}</div>`;toTop()}
 function mchk(i){const all=[...document.querySelectorAll(`[id^="mt${i}_"]`)].every(c=>c.checked);$('#mc'+i).disabled=!all}
 // ---- Thi thử ----
@@ -1086,7 +1083,7 @@ function test(){mark('test');
 const nrm=s=>String(s).toLowerCase().replace(/[£$.,]/g,'').replace(/\s+/g,' ').trim();
 function mhead(t){document.body.classList.add('insess');window.ret=test;return `<div class="sess">${gHead(0)}<span class="tag" style="--c:var(--sun)">${t}</span>`}
 function mtL(){const L=MOCK.listen;let n=0;
- $('#app').innerHTML=mhead('Thi thử · Listening')+`<p class="sub">Trong phòng thi bạn chỉ nghe 1 lần. Ở đây được nghe lại, nhưng hãy thử nghe 1 lần trước.</p>`+L.map((p,pi)=>`<h2 class="sec">${p.part}</h2><button class="play" onclick="say(MOCK.listen[${pi}].audio,.9)"><span>▶ Nghe phần ${pi+1}</span><small>bấm lần nữa để nghe lại</small></button>`+
+ $('#app').innerHTML=mhead('Thi thử · Listening')+L.map((p,pi)=>`<h2 class="sec">${p.part}</h2><button class="play" onclick="say(MOCK.listen[${pi}].audio,.9)"><span>▶ Nghe phần ${pi+1}</span><small>bấm lần nữa để nghe lại</small></button>`+
   p.qs.map(q=>{n++;return q.length===2?`<label class="task" style="flex-direction:column;gap:4px;margin-bottom:10px">${n}. ${esc(q[0])}<input class="inp" id="lq${n}" autocomplete="off" autocapitalize="off"></label>`:
    `<div style="margin-bottom:12px"><b>${n}. ${esc(q[0])}</b>${q[1].map((o,oi)=>`<label class="task"><input type="radio" name="lq${n}" value="${oi}">${String.fromCharCode(65+oi)}. ${esc(o)}</label>`).join('')}</div>`}).join('')).join('')+
   `<button class="btn" onclick="gradeL()" style="margin-top:12px">Nộp bài & xem đáp án</button><div id="res"></div></div>`;toTop()}
@@ -1110,7 +1107,7 @@ function gradeR(){clearInterval(window.tmr);let c=0,rows='';MOCK.read.qs.forEach
  if(q.t==='gap'){const e=$('#rq'+i);got=e.value;ok=q.a.includes(nrm(got));ans=q.a[0];e.classList.add(ok?'r':'w')}
  else{const o=q.t==='tfng'?TFN:q.o,s=document.querySelector(`[name=rq${i}]:checked`);got=s?o[+s.value]:'';ok=s&&+s.value===q.a;ans=o[q.a]}
  if(ok)c++;rows+=`<tr><td>${i+1}</td><td>${ok?'✓':'✗'}</td><td>${esc(got||'(bỏ trống)')}</td><td><b>${esc(ans)}</b></td></tr>`});MT=null;
- mres(c,MOCK.read.qs.length,BAND_R,rows,'<p class="sub" style="margin-top:10px">Mẹo: Not Given là khi bài đọc không hề nhắc tới thông tin đó. False là khi bài đọc nói ngược lại.</p>','R')}
+ mres(c,MOCK.read.qs.length,BAND_R,rows,'','R')}
 function mtW(k){const W=k===1?MOCK.w1:MOCK.w2,min=k===1?150:250;
  let chart='';if(k===1){const mx=50;chart=`<svg viewBox="0 0 320 180" style="width:100%;max-width:520px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:8px 0" role="img" aria-label="Biểu đồ cột phương tiện đi làm 2005 và 2025">${[0,10,20,30,40,50].map(v=>`<line x1="34" x2="312" y1="${150-v*2.6}" y2="${150-v*2.6}" stroke="#F2C6C9" stroke-width=".6"/><text x="28" y="${153-v*2.6}" font-size="8" text-anchor="end" fill="#7A5A5F">${v}%</text>`).join('')}${W.data.map((r,i)=>{const x=48+i*68;return `<rect x="${x}" y="${150-r[1]*2.6}" width="22" height="${r[1]*2.6}" fill="#F2A0AC"/><rect x="${x+24}" y="${150-r[2]*2.6}" width="22" height="${r[2]*2.6}" fill="#E4002B"/><text x="${x+11}" y="${146-r[1]*2.6}" font-size="8" text-anchor="middle" fill="#2A1216">${r[1]}</text><text x="${x+35}" y="${146-r[2]*2.6}" font-size="8" text-anchor="middle" fill="#2A1216">${r[2]}</text><text x="${x+23}" y="164" font-size="9" text-anchor="middle" fill="#2A1216">${r[0]}</text>`}).join('')}<rect x="200" y="170" width="8" height="8" fill="#F2A0AC"/><text x="211" y="177" font-size="8" fill="#2A1216">2005</text><rect x="245" y="170" width="8" height="8" fill="#E4002B"/><text x="256" y="177" font-size="8" fill="#2A1216">2025</text></svg>`}
  $('#app').innerHTML=mhead('Thi thử · Writing Task '+k)+`<p class="qtext" style="font-size:1.1rem">${esc(W.q)}</p>${chart}<ul class="list">${W.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
@@ -1121,14 +1118,14 @@ function wDone(k){const W=k===1?MOCK.w1:MOCK.w2,t=$('#wt').value,n=(t.trim().mat
  const ck=[[n>=min,`Đủ ${min} từ (bạn viết ${n})`],[k===1?has('overall'):has('in conclusion')||has('to conclude'),k===1?'Có câu Overall':'Có kết bài (In conclusion…)'],[['however','in addition','moreover','firstly','by contrast','similarly','while','whereas'].some(has),'Có từ nối'],[t.split(/\n\s*\n/).length>=3,'Chia từ 3 đoạn trở lên']];
  if(n>=40){S.xp+=30;day().xp+=30;S.sk.W+=30;save();sfx.win()}
  $('#res').innerHTML=`<h2 class="sec">Tự kiểm tra</h2>${ck.map(c=>`<p class="task">${c[0]?'✅':'⬜'} ${c[1]}</p>`).join('')}<h2 class="sec">${k===1?'Bài mẫu (band ~6)':'Dàn ý gợi ý'}</h2><div class="passage" style="max-height:none;white-space:pre-line">${esc(k===1?W.model:W.outline)}</div>
- <p class="sub">App chưa chấm điểm bài viết tự động. Muốn chấm chi tiết, bạn copy bài và gửi Claude kèm câu: "Chấm bài IELTS Writing theo 4 tiêu chí".</p><button class="btn ghost" onclick="exitS()">Về tab Thi thử</button>`;$('#res').scrollIntoView({behavior:'smooth'})}
+ <button class="btn ghost" onclick="exitS()">Về tab Thi thử</button>`;$('#res').scrollIntoView({behavior:'smooth'})}
 // ---- Phiếu chấm đề sách ----
 function bk(){try{return JSON.parse(localStorage.getItem('ieltsq_keys')||'{}')}catch(e){return{}}}
 function bookKey(){document.body.classList.add('insess');window.ret=test;const K=bk();
  $('#app').innerHTML=`<div class="sess">${gHead(0)}<span class="tag" style="--c:var(--sun)">Chấm đề sách Cambridge</span><h2 class="qtext">Phiếu trả lời 40 câu</h2>
- <p class="sub">Cách dùng với Cambridge IELTS 21 (hoặc cuốn bất kỳ) của bạn: 1) Làm bài trong sách. 2) Lần đầu, chép đáp án ở cuối sách vào ô Đáp án, mỗi dòng 1 câu. Nhiều đáp án đúng thì ngăn bằng dấu /, ví dụ: <b>10 / ten</b>. 3) Nhập câu trả lời của bạn vào 40 ô, bấm Chấm. Đáp án được lưu riêng trên máy bạn.</p>
+ 
  <div class="row"><select class="inp" id="bt" onchange="bkLoad()">${['Test 1','Test 2','Test 3','Test 4'].map(t=>`<option>${t}</option>`).join('')}</select><select class="inp" id="bs" onchange="bkLoad()"><option>Listening</option><option>Reading</option></select></div>
- <p class="sub">Có file <b>cam21_dap_an.txt</b>? Nạp một lần là đủ 4 test: <input type="file" accept=".txt" id="kf" onchange="bkFile(this)" aria-label="Nạp file đáp án"></p><details class="wl" id="kd"><summary>Đáp án (chép từ sách)</summary><textarea class="inp" id="bkey" style="margin-top:8px" placeholder="1 dòng = 1 câu, đủ 40 dòng"></textarea><button class="btn ghost" style="margin-top:8px" onclick="bkSave()">Lưu đáp án</button></details>
+ <p class="sub">Nạp file đáp án: <input type="file" accept=".txt" id="kf" onchange="bkFile(this)" aria-label="Nạp file đáp án"></p><details class="wl" id="kd"><summary>Đáp án (chép từ sách)</summary><textarea class="inp" id="bkey" style="margin-top:8px" placeholder="1 dòng = 1 câu, đủ 40 dòng"></textarea><button class="btn ghost" style="margin-top:8px" onclick="bkSave()">Lưu đáp án</button></details>
  <div class="ans" style="margin-top:14px">${Array.from({length:40},(_,i)=>`<label>${i+1}<input id="ba${i}" autocomplete="off" autocapitalize="off"></label>`).join('')}</div>
  <button class="btn" style="margin-top:14px" onclick="bkGrade()">Chấm</button><div id="res"></div></div>`;bkLoad();toTop()}
 const bkId=()=>$('#bt').value+'|'+$('#bs').value;
