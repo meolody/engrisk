@@ -1,10 +1,10 @@
 {
- "name": "Leo band IELTS",
- "short_name": "IELTS",
+ "name": "Engrisk w me",
+ "short_name": "Engrisk",
  "start_url": "/",
  "display": "standalone",
  "background_color": "#FFFFFF",
- "theme_color": "#E4002B",
+ "theme_color": "#D62839",
  "icons": [
   {
    "src": "icon-192.png",
