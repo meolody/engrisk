@@ -1,996 +1,1034 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Progress Tracker</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffeef8 0%, #ffe0f0 50%, #ffd1e8 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #fef7f7;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.3);
-            text-align: center;
-            transition: transform 0.3s ease;
-            border: 2px solid #ffe0e6;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #ff6b9d;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .progress-section {
-            padding: 30px;
-            background: #fefefe;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            color: #ff6b9d;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .progress-bar {
-            background: #ffe0e6;
-            height: 20px;
-            border-radius: 10px;
-            margin: 10px 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff9a9e, #fecfef);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #333;
-            font-weight: bold;
-            font-size: 0.8em;
-        }
-
-        .daily-tracker {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .day-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
-            border: 2px solid #ffe0e6;
-        }
-
-        .day-header {
-            font-weight: bold;
-            color: #ff6b9d;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #fef7f7;
-            border-radius: 8px;
-            transition: background 0.3s ease;
-        }
-
-        .task-item:hover {
-            background: #ffe0e6;
-        }
-
-        .task-checkbox {
-            width: 20px;
-            height: 20px;
-            margin-right: 15px;
-            cursor: pointer;
-            accent-color: #ff6b9d;
-        }
-
-        .task-text {
-            flex: 1;
-            color: #333;
-        }
-
-        .task-time {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .completed {
-            text-decoration: line-through;
-            opacity: 0.6;
-        }
-
-        .books-section {
-            background: #fef7f7;
-            padding: 30px;
-        }
-
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .book-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
-            border: 2px solid #ffe0e6;
-        }
-
-        .book-title {
-            font-weight: bold;
-            color: #ff6b9d;
-            margin-bottom: 10px;
-            font-size: 0.9em;
-        }
-
-        .achievement-section {
-            background: linear-gradient(135deg, #ffe0e6 0%, #fecfef 100%);
-            padding: 30px;
-        }
-
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .achievement-card {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
-            transition: transform 0.3s ease;
-            border: 2px solid #ffe0e6;
-            height: 180px;
-        }
-
-        .achievement-card:hover {
-            transform: scale(1.05);
-        }
-
-        .achievement-icon {
-            font-size: 1.8em;
-            margin-bottom: 8px;
-        }
-
-        .achievement-title {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .achievement-desc {
-            color: #666;
-            font-size: 0.8em;
-        }
-
-        .earned {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            color: white;
-            border-color: #ff6b9d;
-        }
-
-        .earned .achievement-title,
-        .earned .achievement-desc {
-            color: white;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: transform 0.3s ease;
-            margin: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 155, 158, 0.4);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 15% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-            border: 2px solid #ffe0e6;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #ff6b9d;
-        }
-
-        .input-group {
-            margin: 15px 0;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #ff6b9d;
-            font-weight: bold;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ffe0e6;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #ff6b9d;
-        }
-
-        .note-section {
-            padding: 30px;
-            background: #fef7f7;
-        }
-
-        .note-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 2px solid #ffe0e6;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-
-        .random-note {
-            margin-top: 10px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 2px solid #ffe0e6;
-            color: #333;
-        }
-
-        .random-note-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .random-note-content {
-            text-align: center;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .daily-tracker {
-                grid-template-columns: 1fr;
-            }
-            .books-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🌸 IELTS Progress Tracker</h1>
-            <p>Hành trình chinh phục IELTS 6.0 của bạn</p>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="totalPoints">0</div>
-                <div class="stat-label">Điểm tích lũy</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="studyStreak">0</div>
-                <div class="stat-label">Streak (ngày)</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalHours">0</div>
-                <div class="stat-label">Tổng giờ học</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="daysLeft">230</div>
-                <div class="stat-label">Ngày còn lại</div>
-            </div>
-        </div>
-
-        <div class="progress-section">
-            <h2 class="section-title">📊 Tiến độ tổng quan</h2>
-            <div class="progress-bar">
-                <div class="progress-fill" id="overallProgress" style="width: 5%"></div>
-                <div class="progress-text">5% hoàn thành</div>
-            </div>
-        </div>
-
-        <div class="progress-section">
-            <h2 class="section-title">📅 Lịch học hôm nay</h2>
-            <div class="daily-tracker" id="dailyTasks"></div>
-        </div>
-
-        <div class="books-section">
-            <h2 class="section-title">📚 Tiến độ sách</h2>
-            <div class="books-grid">
-                <div class="book-card">
-                    <div class="book-title">Grammar in Use</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="grammarProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/120 units</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('grammar')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">Vocabulary in Use</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="vocabProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/60 units</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('vocab')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">Pronunciation in Use</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="pronunProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/50 units</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('pronun')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">IELTS Reading A2+</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="readingBookProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/12 lessons</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('readingBook')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">IELTS Listening A2+</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="listeningProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/12 lessons</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('listening')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">IELTS Speaking A2+</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="speakingProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/12 lessons</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('speaking')">Cập nhật</button>
-                </div>
-                <div class="book-card">
-                    <div class="book-title">IELTS Writing A2+</div>
-                    <div class="book-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="writingProgress" style="width: 0%"></div>
-                            <div class="progress-text">0/12 lessons</div>
-                        </div>
-                    </div>
-                    <button class="btn" onclick="updateBookProgress('writing')">Cập nhật</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="achievement-section">
-            <h2 class="section-title">🏆 Thành tựu</h2>
-            <div class="achievements-grid" id="achievementsGrid"></div>
-        </div>
-
-        <div class="note-section">
-            <h2 class="section-title">📝 Ghi chú học tập</h2>
-            <textarea class="note-input" id="noteInput" placeholder="Nhập từ vựng, ngữ pháp, cụm từ hay..."></textarea>
-            <button class="btn" onclick="saveNote()">Lưu ghi chú</button>
-            <div class="random-note">
-                <div class="random-note-title">✽ word of the day ✽</div>
-                <div class="random-note-content" id="randomNoteContent"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="bookModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <h2 id="bookModalTitle">📚 Cập nhật tiến độ sách</h2>
-            <div class="input-group">
-                <label for="unitsCompleted">Số units/lessons đã hoàn thành:</label>
-                <input type="number" id="unitsCompleted" min="0" placeholder="0">
-            </div>
-            <button class="btn" onclick="saveBookProgress()">💾 Lưu tiến độ</button>
-        </div>
-    </div>
-
-    <script>
-        let data = {
-            totalPoints: 0,
-            studyStreak: 0,
-            totalHours: 0,
-            overallProgress: 5,
-            books: {
-                grammar: { completed: 0, total: 120 },
-                vocab: { completed: 0, total: 60 },
-                pronun: { completed: 0, total: 50 },
-                readingBook: { completed: 0, total: 12 },
-                listening: { completed: 0, total: 12 },
-                speaking: { completed: 0, total: 12 },
-                writing: { completed: 0, total: 12 }
-            },
-            dailyTasks: {},
-            achievements: [],
-            lastStudyDate: null,
-            notes: []
-        };
-
-        let currentBook = '';
-
-        const achievements = [
-            { id: 'firstDay', icon: '🌟', title: 'Khởi đầu', desc: 'Hoàn thành ngày học đầu tiên', points: 50 },
-            { id: 'week1', icon: '🔥', title: 'Tuần đầu', desc: 'Học đều 7 ngày liên tiếp', points: 100 },
-            { id: 'grammar25', icon: '📝', title: 'Grammar Master I', desc: 'Hoàn thành 25% Grammar in Use', points: 75 },
-            { id: 'vocab25', icon: '📚', title: 'Vocabulary Builder I', desc: 'Hoàn thành 25% Vocabulary in Use', points: 75 },
-            { id: 'month1', icon: '📅', title: 'Bền bỉ', desc: 'Đạt 50 giờ học tổng cộng', points: 200 }
-        ];
-
-        const dailyTasksByPhase = {
-            1: { // Giai đoạn 1: Tháng 6/2025 - Tháng 7/2025
-                weekday: {
-                    1: [
-                        { text: 'Grammar (20p)', time: '20p', points: 10 },
-                        { text: 'Vocabulary (20p)', time: '20p', points: 10 },
-                        { text: 'Games/Apps (20p)', time: '20p', points: 5 }
-                    ],
-                    2: [
-                        { text: 'Pronunciation (30p)', time: '30p', points: 15 },
-                        { text: 'Xem phim có phụ đề (30p)', time: '30p', points: 5 }
-                    ],
-                    3: [
-                        { text: 'Grammar (20p)', time: '20p', points: 10 },
-                        { text: 'Vocabulary (20p)', time: '20p', points: 10 },
-                        { text: 'Games/Apps (20p)', time: '20p', points: 5 }
-                    ],
-                    4: [
-                        { text: 'Pronunciation (30p)', time: '30p', points: 15 },
-                        { text: 'Xem phim có phụ đề (30p)', time: '30p', points: 5 }
-                    ],
-                    5: [
-                        { text: 'Grammar (20p)', time: '20p', points: 10 },
-                        { text: 'Vocabulary (20p)', time: '20p', points: 10 },
-                        { text: 'Games/Apps (20p)', time: '20p', points: 5 }
-                    ],
-                    6: [
-                        { text: 'Practice test mini hoặc ôn tập tuần', time: '1h', points: 20 },
-                        { text: 'Hoạt động thú vị (phim không phụ đề, games, YouTube)', time: '1h', points: 10 }
-                    ]
-                },
-                weekend: {
-                    0: [
-                        { text: 'Review vocabulary (30p)', time: '30p', points: 5 }
-                    ]
-                }
-            },
-            2: { // Giai đoạn 2: Tháng 8/2025 - Tháng 9/2025
-                weekday: {
-                    1: [
-                        { text: 'Grammar (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 },
-                        { text: 'IELTS Reading (30p)', time: '30p', points: 15 }
-                    ],
-                    2: [
-                        { text: 'IELTS Listening (45p)', time: '45p', points: 20 },
-                        { text: 'Xem phim không phụ đề (45p)', time: '45p', points: 10 }
-                    ],
-                    3: [
-                        { text: 'Grammar (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 },
-                        { text: 'IELTS Reading (30p)', time: '30p', points: 15 }
-                    ],
-                    4: [
-                        { text: 'IELTS Listening (45p)', time: '45p', points: 20 },
-                        { text: 'Xem phim không phụ đề (45p)', time: '45p', points: 10 }
-                    ],
-                    5: [
-                        { text: 'Grammar (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 },
-                        { text: 'IELTS Reading (30p)', time: '30p', points: 15 }
-                    ],
-                    6: [
-                        { text: 'Practice test (Reading + Listening) (1.5h)', time: '1.5h', points: 30 },
-                        { text: 'Review và sửa lỗi (1h)', time: '1h', points: 15 },
-                        { text: 'Hoạt động thú vị bằng tiếng Anh (30p)', time: '30p', points: 10 }
-                    ]
-                },
-                weekend: {
-                    0: [
-                        { text: 'Review vocabulary (30p)', time: '30p', points: 5 }
-                    ]
-                }
-            },
-            3: { // Giai đoạn 3: Tháng 10/2025 - Tháng 11/2025
-                weekday: {
-                    1: [
-                        { text: 'IELTS Writing (45p)', time: '45p', points: 20 },
-                        { text: 'Grammar advanced (30p)', time: '30p', points: 15 },
-                        { text: 'Pronunciation (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (15p)', time: '15p', points: 10 }
-                    ],
-                    2: [
-                        { text: 'IELTS Speaking practice (1h)', time: '1h', points: 25 },
-                        { text: 'IELTS Reading/Listening (45p)', time: '45p', points: 20 },
-                        { text: 'Podcast (15p)', time: '15p', points: 5 }
-                    ],
-                    3: [
-                        { text: 'IELTS Writing (45p)', time: '45p', points: 20 },
-                        { text: 'Grammar advanced (30p)', time: '30p', points: 15 },
-                        { text: 'Pronunciation (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (15p)', time: '15p', points: 10 }
-                    ],
-                    4: [
-                        { text: 'IELTS Speaking practice (1h)', time: '1h', points: 25 },
-                        { text: 'IELTS Reading/Listening (45p)', time: '45p', points: 20 },
-                        { text: 'Podcast (15p)', time: '15p', points: 5 }
-                    ],
-                    5: [
-                        { text: 'IELTS Writing (45p)', time: '45p', points: 20 },
-                        { text: 'Grammar advanced (30p)', time: '30p', points: 15 },
-                        { text: 'Pronunciation (30p)', time: '30p', points: 15 },
-                        { text: 'Vocabulary (15p)', time: '15p', points: 10 }
-                    ],
-                    6: [
-                        { text: 'Full practice test (4 skills) (2h)', time: '2h', points: 40 },
-                        { text: 'Gaming session/voice chat tiếng Anh (1h)', time: '1h', points: 15 }
-                    ]
-                },
-                weekend: {
-                    0: [
-                        { text: 'Review vocabulary (30p)', time: '30p', points: 5 }
-                    ]
-                }
-            },
-            4: { // Giai đoạn 4: Tháng 12/2025 - Tháng 1/2026
-                weekday: {
-                    1: [
-                        { text: 'IELTS practice (1h luân phiên 4 skills)', time: '1h', points: 25 },
-                        { text: 'Authentic materials (1h)', time: '1h', points: 20 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 }
-                    ],
-                    2: [
-                        { text: 'IELTS practice (1h luân phiên 4 skills)', time: '1h', points: 25 },
-                        { text: 'Authentic materials (1h)', time: '1h', points: 20 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 }
-                    ],
-                    3: [
-                        { text: 'Grammar/Pronunciation fine-tuning (30p)', time: '30p', points: 15 },
-                        { text: 'Writing practice (2h)', time: '2h', points: 30 }
-                    ],
-                    4: [
-                        { text: 'IELTS practice (1h luân phiên 4 skills)', time: '1h', points: 25 },
-                        { text: 'Authentic materials (1h)', time: '1h', points: 20 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 }
-                    ],
-                    5: [
-                        { text: 'IELTS practice (1h luân phiên 4 skills)', time: '1h', points: 25 },
-                        { text: 'Authentic materials (1h)', time: '1h', points: 20 },
-                        { text: 'Vocabulary (30p)', time: '30p', points: 15 }
-                    ],
-                    6: [
-                        { text: 'Full IELTS practice test + review (2.5h)', time: '2.5h', points: 50 },
-                        { text: 'Relaxing English content (30p)', time: '30p', points: 10 }
-                    ]
-                },
-                weekend: {
-                    0: [
-                        { text: 'Ôn lại vocabulary đã học', time: '1h', points: 10 },
-                        { text: 'Làm quiz/test nhỏ', time: '1h', points: 10 },
-                        { text: 'Đánh giá điểm mạnh/yếu', time: '30p', points: 5 },
-                        { text: 'Điều chỉnh kế hoạch tuần sau', time: '30p', points: 5 }
-                    ]
-                }
-            }
-        };
-
-        function initApp() {
-            loadData();
-            updateDisplay();
-            generateDailyTasks();
-            showRandomNote();
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem('ieltsTrackerData');
-            if (savedData) {
-                data = { ...data, ...JSON.parse(savedData) };
-            } else {
-                data.dailyTasks = {};
-            }
-            if (data.lastStudyDate && typeof data.lastStudyDate !== 'string') {
-                data.lastStudyDate = new Date(data.lastStudyDate).toDateString();
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem('ieltsTrackerData', JSON.stringify(data));
-        }
-
-        function updateDisplay() {
-            document.getElementById('totalPoints').textContent = data.totalPoints;
-            document.getElementById('studyStreak').textContent = data.studyStreak;
-            document.getElementById('totalHours').textContent = Math.floor(data.totalHours * 10) / 10;
-            
-            const today = new Date();
-            const endDate = new Date('2026-01-31');
-            const timeDiff = endDate - today;
-            const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-            document.getElementById('daysLeft').textContent = daysLeft > 0 ? daysLeft : 0;
-
-            const bookProgress = Object.values(data.books).reduce((sum, book) => 
-                sum + (book.completed / book.total), 0) / Object.keys(data.books).length;
-            data.overallProgress = Math.min(100, Math.floor(bookProgress * 100));
-            
-            document.getElementById('overallProgress').style.width = data.overallProgress + '%';
-            document.querySelector('#overallProgress + .progress-text').textContent = data.overallProgress + '% hoàn thành';
-
-            Object.keys(data.books).forEach(book => {
-                const progress = (data.books[book].completed / data.books[book].total) * 100;
-                const progressEl = document.getElementById(book + 'Progress');
-                if (progressEl) {
-                    progressEl.style.width = Math.min(100, progress) + '%';
-                    const textEl = document.querySelector(`#${book}Progress + .progress-text`);
-                    if (textEl) {
-                        textEl.textContent = 
-                            `${data.books[book].completed}/${data.books[book].total} ${book.includes('Book') || ['listening', 'speaking', 'writing'].includes(book) ? 'lessons' : 'units'}`;
-                    }
-                }
-            });
-
-            updateAchievements();
-        }
-
-        function updateStreak() {
-            const today = new Date();
-            const todayStr = today.toDateString();
-            const yesterday = new Date(today - 24 * 60 * 60 * 1000).toDateString();
-            
-            if (!data.lastStudyDate) {
-                data.studyStreak = 1; // Bắt đầu streak nếu chưa có ngày học nào
-                data.lastStudyDate = todayStr;
-            } else if (data.lastStudyDate !== todayStr && data.lastStudyDate === yesterday) {
-                data.studyStreak++; // Tăng streak nếu học hôm qua
-                data.lastStudyDate = todayStr;
-            } else if (data.lastStudyDate !== todayStr && data.lastStudyDate !== yesterday) {
-                data.studyStreak = 1; // Reset streak nếu bỏ lỡ ngày
-                data.lastStudyDate = todayStr;
-            }
-            saveData();
-        }
-
-        function generateDailyTasks() {
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const currentMonth = today.getMonth() + 1;
-            let phase = 1;
-
-            if (currentMonth >= 6 && currentMonth <= 7) phase = 1;
-            else if (currentMonth >= 8 && currentMonth <= 9) phase = 2;
-            else if (currentMonth >= 10 && currentMonth <= 11) phase = 3;
-            else if (currentMonth >= 12 || currentMonth === 1) phase = 4;
-
-            let tasks = [];
-            if (dayOfWeek >= 1 && dayOfWeek <= 6) tasks = dailyTasksByPhase[phase].weekday[dayOfWeek] || [];
-            else if (dayOfWeek === 0) tasks = dailyTasksByPhase[phase].weekend[0] || [];
-
-            const todayKey = today.toDateString();
-            if (!data.dailyTasks[todayKey]) data.dailyTasks[todayKey] = tasks.map(() => false);
-
-            const container = document.getElementById('dailyTasks');
-            container.innerHTML = `
-                <div class="day-card">
-                    <div class="day-header">${dayOfWeek === 0 ? '🌅 Chủ nhật' : dayOfWeek === 6 ? '🌅 Thứ 7' : '📚 Ngày thường'}</div>
-                    ${tasks.map((task, index) => `
-                        <div class="task-item">
-                            <input type="checkbox" class="task-checkbox" id="task${index}" 
-                                ${data.dailyTasks[todayKey][index] ? 'checked' : ''} 
-                                onchange="taskCompleted(${index}, ${task.points})">
-                            <label for="task${index}" class="task-text ${data.dailyTasks[todayKey][index] ? 'completed' : ''}">${task.text}</label>
-                            <span class="task-time">${task.time} (+${task.points}pts)</span>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function taskCompleted(taskIndex, points) {
-            const checkbox = document.getElementById(`task${taskIndex}`);
-            const taskText = checkbox.nextElementSibling;
-            const taskTimeElement = taskText.nextElementSibling;
-            const today = new Date();
-            const todayStr = today.toDateString();
-            
-            if (!data.dailyTasks[todayStr] || !Array.isArray(data.dailyTasks[todayStr])) {
-                data.dailyTasks[todayStr] = [];
-            }
-
-            if (checkbox.checked) {
-                taskText.classList.add('completed');
-                data.totalPoints += points;
-
-                const timeStr = taskTimeElement.textContent.match(/\d+(?:\.\d+)?[hmp]/i)[0];
-                let hours = 0;
-                if (timeStr.includes('h')) hours = parseFloat(timeStr.replace('h', ''));
-                else if (timeStr.includes('p') || timeStr.includes('m')) hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60;
-                data.totalHours += hours;
-
-                data.dailyTasks[todayStr][taskIndex] = true;
-                if (!data.lastStudyDate || data.lastStudyDate !== todayStr) {
-                    updateStreak();
-                }
-                showNotification(`+${points} điểm! 🎉 Streak hiện tại: ${data.studyStreak}`);
-            } else {
-                taskText.classList.remove('completed');
-                data.totalPoints = Math.max(0, data.totalPoints - points);
-
-                const timeStr = taskTimeElement.textContent.match(/\d+(?:\.\d+)?[hmp]/i)[0];
-                let hours = 0;
-                if (timeStr.includes('h')) hours = parseFloat(timeStr.replace('h', ''));
-                else if (timeStr.includes('p') || timeStr.includes('m')) hours = parseFloat(timeStr.replace(/[pm]/i, '')) / 60;
-                data.totalHours = Math.max(0, data.totalHours - hours);
-
-                data.dailyTasks[todayStr][taskIndex] = false;
-            }
-            
-            saveData();
-            updateDisplay();
-            checkAchievements();
-        }
-
-        function updateAchievements() {
-            const container = document.getElementById('achievementsGrid');
-            container.innerHTML = achievements.map(achievement => {
-                const earned = data.achievements.includes(achievement.id);
-                return `
-                    <div class="achievement-card ${earned ? 'earned' : ''}">
-                        <div class="achievement-icon">${achievement.icon}</div>
-                        <div class="achievement-title">${achievement.title}</div>
-                        <div class="achievement-desc">${achievement.desc}</div>
-                        <div style="margin-top: 10px; font-weight: bold;">+${achievement.points} pts</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function checkAchievements() {
-            achievements.forEach(achievement => {
-                if (!data.achievements.includes(achievement.id)) {
-                    let earned = false;
-                    switch(achievement.id) {
-                        case 'firstDay': earned = data.totalHours >= 1; break;
-                        case 'week1': earned = data.studyStreak >= 7; break;
-                        case 'grammar25': earned = data.books.grammar.completed >= data.books.grammar.total * 0.25; break;
-                        case 'vocab25': earned = data.books.vocab.completed >= data.books.vocab.total * 0.25; break;
-                        case 'month1': earned = data.totalHours >= 50; break;
-                    }
-                    if (earned) {
-                        data.achievements.push(achievement.id);
-                        data.totalPoints += achievement.points;
-                        showNotification(`🏆 Thành tựu mới: ${achievement.title}! +${achievement.points} pts`);
-                        saveData();
-                    }
-                }
-            });
-            updateDisplay();
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 25px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: slideIn 0.5s ease;
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-        function updateBookProgress(bookType) {
-            currentBook = bookType;
-            const titleMap = {
-                'grammar': 'Grammar in Use',
-                'vocab': 'Vocabulary in Use', 
-                'pronun': 'Pronunciation in Use',
-                'readingBook': 'IELTS Reading A2+',
-                'listening': 'IELTS Listening A2+',
-                'speaking': 'IELTS Speaking A2+',
-                'writing': 'IELTS Writing A2+'
-            };
-            document.getElementById('bookModalTitle').textContent = `📚 Cập nhật tiến độ - ${titleMap[bookType]}`;
-            document.getElementById('unitsCompleted').value = data.books[bookType].completed;
-            document.getElementById('unitsCompleted').max = data.books[bookType].total;
-            document.getElementById('bookModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('bookModal').style.display = 'none';
-        }
-
-        function saveBookProgress() {
-            const completed = parseInt(document.getElementById('unitsCompleted').value) || 0;
-            const maxUnits = data.books[currentBook].total;
-            if (completed >= 0 && completed <= maxUnits) {
-                data.books[currentBook].completed = completed;
-                saveData();
-                updateDisplay();
-                checkAchievements();
-                closeModal();
-                showNotification(`📚 Đã cập nhật tiến độ sách!`);
-            }
-        }
-
-        function saveNote() {
-            const note = document.getElementById('noteInput').value.trim();
-            if (note) {
-                data.notes.push(note);
-                document.getElementById('noteInput').value = '';
-                saveData();
-                showRandomNote();
-                showNotification('📝 Ghi chú đã được lưu!');
-            }
-        }
-
-        function showRandomNote() {
-            const randomNoteContent = document.getElementById('randomNoteContent');
-            if (data.notes.length > 0) {
-                const randomIndex = Math.floor(Math.random() * data.notes.length);
-                randomNoteContent.textContent = data.notes[randomIndex];
-            } else {
-                randomNoteContent.textContent = 'Chưa có ghi chú nào. Hãy thêm ghi chú để xem!';
-            }
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('bookModal');
-            if (event.target === modal) closeModal();
-        };
-
-        initApp();
-    </script>
-</body>
-</html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E4002B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Leo band IELTS">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Leo band IELTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* Layout: một cột như app điện thoại; trên cùng là thanh XP, giữa là "ngọn núi band", dưới là thẻ kỹ năng */
+:root{
+  --ink:#0E1A2B; --panel:#16263D; --panel2:#1C3150; --line:#2A4668;
+  --text:#EAF0F7; --muted:#9FB2C8; --sun:#FFC145; --sun-ink:#2A1D00;
+  --ok:#3DDC97; --bad:#FF6B6B;
+  --cL:#5BC0FF; --cR:#B69CFF; --cW:#FF9F6B; --cS:#3DDC97; --cV:#FFC145;
+  --display:'Bricolage Grotesque','Be Vietnamese Pro',system-ui,sans-serif;
+  --body:'Be Vietnamese Pro',system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--ink);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5}
+body{padding:0 16px 56px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.15}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto}
+.top{position:sticky;top:0;z-index:5;background:var(--ink);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.toprow{display:flex;align-items:center;gap:12px}
+.lvl{font-family:var(--display);font-weight:800;background:var(--sun);color:var(--sun-ink);border-radius:10px;padding:4px 10px;white-space:nowrap}
+.xpbar{flex:1;height:10px;border-radius:99px;background:var(--panel);overflow:hidden}
+.xpbar i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .5s}
+.streak{font-weight:700;white-space:nowrap}
+.hero{padding:22px 0 8px}
+.hero h1{font-size:2rem;font-weight:800}
+.hero p{color:var(--muted);margin:6px 0 0}
+.mount{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin:14px 0}
+.mount svg{width:100%;height:auto;display:block}
+.sub{color:var(--muted);font-size:.9rem}
+.daily{display:flex;flex-direction:column;gap:8px;margin:10px 0 0}
+.q-item{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:12px;padding:10px 12px}
+.q-item.done{opacity:.6}
+.q-item .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.8rem}
+.q-item.done .chk{background:var(--ok);border-color:var(--ok);color:#06241a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c,var(--line));border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:128px}
+.card:hover{background:var(--panel2)}
+.card h3{font-size:1.15rem}
+.card .bar{height:6px;border-radius:9px;background:var(--ink);overflow:hidden;margin-top:auto}
+.card .bar i{display:block;height:100%;background:var(--c)}
+.btn{background:var(--sun);color:var(--sun-ink);border:0;border-radius:14px;padding:14px 18px;font-weight:800;font-family:var(--display);font-size:1.05rem;width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--text);border:2px solid var(--line)}
+.btn.boss{background:var(--bad);color:#2b0000}
+.row{display:flex;gap:10px;margin-top:12px}
+.sec{margin:22px 0 4px;font-size:1.05rem}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.badge{background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:.85rem}
+.badge.off{opacity:.35}
+/* Màn làm bài */
+.sess{padding-top:14px}
+.sesshead{display:flex;align-items:center;gap:12px}
+.x{background:var(--panel);border:1px solid var(--line);border-radius:10px;width:38px;height:38px}
+.prog{flex:1;height:12px;border-radius:99px;background:var(--panel);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--c,var(--sun));transition:width .3s}
+.combo{font-family:var(--display);font-weight:800;color:var(--sun);min-width:44px;text-align:right}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c);margin:18px 0 6px}
+.qtext{font-family:var(--display);font-size:1.4rem;font-weight:700;margin:0 0 14px}
+.passage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;max-height:34vh;overflow:auto;font-size:.97rem}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:13px 14px;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt.ok{border-color:var(--ok);background:rgba(61,220,151,.14)}
+.opt.bad{border-color:var(--bad);background:rgba(255,107,107,.14)}
+.play{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--panel2);border:2px solid var(--cL);border-radius:16px;padding:18px;font-weight:700;margin-bottom:14px}
+.play small{color:var(--muted);font-weight:400}
+.feed{margin-top:14px;border-radius:14px;padding:14px;background:var(--panel2);border-left:6px solid var(--ok)}
+.feed.bad{border-left-color:var(--bad)}
+.feed b{font-family:var(--display);font-size:1.1rem}
+.feed p{margin:6px 0 0;color:var(--muted)}
+.tray,.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border-radius:14px}
+.tray{background:var(--panel);border:2px dashed var(--line);margin-bottom:12px}
+.chip{background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:600}
+.inp{width:100%;background:var(--panel);border:2px solid var(--line);border-radius:14px;color:var(--text);padding:13px;font:inherit}
+.timer{font-family:var(--display);font-size:3rem;font-weight:800;text-align:center;margin:10px 0;color:var(--cS)}
+.list{margin:6px 0 0;padding-left:20px;color:var(--muted)}
+.sum{text-align:center;padding:30px 0 10px}
+.sum .big{font-family:var(--display);font-size:3.4rem;font-weight:800;color:var(--sun)}
+.stats{display:flex;gap:10px;margin:18px 0}
+.stats div{flex:1;background:var(--panel);border-radius:14px;padding:12px;text-align:center}
+.stats b{display:block;font-family:var(--display);font-size:1.5rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--sun);color:var(--sun-ink);font-weight:800;padding:12px 18px;border-radius:14px;z-index:9;max-width:90%;text-align:center}
+.pop{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:380px){.grid{grid-template-columns:1fr}}
+.selb{border-color:var(--sun)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mgrid>div{display:flex;flex-direction:column;gap:10px}
+.mgrid .opt{padding:12px 10px;font-size:.95rem}
+.dform{display:flex;gap:10px}
+a{color:var(--cL)}
+.wl{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.wl summary{cursor:pointer;font-weight:700}
+.wlist{list-style:none;margin:10px 0 0;padding:0;max-height:320px;overflow:auto;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.feed a{color:var(--cL)}
+/* Chủ đề đỏ trắng: đỏ IELTS làm điểm nhấn, nền trắng, thẻ hồng nhạt */
+:root{
+  --ink:#FFFFFF; --panel:#FFF3F3; --panel2:#FFE4E5; --line:#F2C6C9;
+  --text:#2A1216; --muted:#7A5A5F; --sun:#E4002B; --sun-ink:#FFFFFF; --deep:#A80020;
+  --ok:#12A66B; --bad:#B3261E;
+  --cL:#1F78D1; --cR:#7A4CD8; --cW:#E8700A; --cS:#12A66B; --cV:#E4002B; --cC:#D81B8A;
+  color-scheme:light;
+}
+body{background:radial-gradient(1200px 380px at 50% -120px,#FFE1E3 0%,#FFFFFF 70%) no-repeat,#fff}
+.top{background:rgba(255,255,255,.94);backdrop-filter:blur(6px);box-shadow:0 2px 10px rgba(228,0,43,.08)}
+.lvl{background:var(--sun);color:#fff}
+.xpbar{background:var(--panel2)}
+.xpbar i{background:linear-gradient(90deg,#FF5A70,#E4002B)}
+.hero{background:linear-gradient(135deg,#E4002B 0%,#B8001F 100%);color:#fff;border-radius:22px;padding:22px;margin-top:14px;position:relative;overflow:hidden;box-shadow:0 10px 24px rgba(228,0,43,.25)}
+.hero::after{content:"";position:absolute;right:-40px;top:-50px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero::before{content:"";position:absolute;right:50px;bottom:-60px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.hero h1,.hero p{position:relative;z-index:1}
+.hero p{color:rgba(255,255,255,.92)}
+.mount,.card,.wl,.stats div,.passage{background:#fff;box-shadow:0 4px 14px rgba(120,20,30,.07)}
+.mount svg polygon{fill:var(--panel2)}
+.card{transition:transform .18s,box-shadow .18s}
+.card:hover{background:#fff;transform:translateY(-4px);box-shadow:0 10px 22px rgba(228,0,43,.16)}
+.card:active{transform:scale(.97)}
+.ico{width:38px;height:38px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-family:var(--display);font-size:1.05rem}
+.btn{background:var(--sun);color:#fff;box-shadow:0 4px 0 var(--deep);transition:transform .08s,box-shadow .08s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--deep)}
+.btn.ghost{background:#fff;color:var(--sun);border:2px solid var(--sun);box-shadow:0 4px 0 var(--line)}
+.btn.yes{background:var(--ok);color:#fff;box-shadow:0 4px 0 #0B7A4D}
+.btn.no{background:var(--bad);color:#fff;box-shadow:0 4px 0 #7D1710}
+.opt{background:#fff;box-shadow:0 3px 0 var(--line);transition:transform .1s,border-color .15s}
+.opt:hover:not(:disabled){transform:translateY(-2px);border-color:var(--sun)}
+.opt:active:not(:disabled){transform:translateY(2px);box-shadow:none}
+.opt.ok{background:#E3F8EE;border-color:var(--ok)}
+.opt.bad{background:#FDE9E7;border-color:var(--bad);animation:shake .35s}
+.opt.bad::after{content:" ✗";color:var(--bad);font-weight:800}
+.opt.ok::after{content:" ✓";color:var(--ok);font-weight:800}
+.q-item.done .chk{color:#fff}
+.chip{background:#fff;box-shadow:0 3px 0 var(--line)}
+.tray{background:#fff}
+.play{background:#fff;border-color:var(--cL)}
+.feed{background:var(--panel);border-left-color:var(--ok)}
+.feed.bad{border-left-color:var(--bad)}
+.feed a,a{color:#B4001F;font-weight:600}
+.toast{background:var(--sun);color:#fff;box-shadow:0 8px 20px rgba(228,0,43,.3)}
+.prog{background:var(--panel2)}
+.x{background:#fff}
+.tag{color:var(--c)}
+.inp{background:#fff}
+.sess,.hero,.mount,.grid{animation:rise .35s both}
+.sum .big{color:var(--sun);text-shadow:0 4px 0 var(--panel2)}
+.snd{position:fixed;right:14px;bottom:14px;z-index:8;width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.1);font-size:1.1rem}
+.fx{position:fixed;left:50%;top:38%;transform:translateX(-50%);font-family:var(--display);font-weight:800;font-size:2.2rem;color:var(--ok);pointer-events:none;z-index:9;animation:floatup 1s forwards}
+#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10}
+.phgrp{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;box-shadow:0 4px 14px rgba(120,20,30,.07)}
+.phgrp h3{font-size:1.1rem}
+.ph{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--panel);border:0;border-radius:12px;padding:10px 12px;margin-top:8px;transition:transform .1s}
+.ph:hover{transform:translateX(4px);background:var(--panel2)}
+.ph b{display:block}
+.ph span.vi{color:var(--muted);font-size:.9rem}
+.ph .sp{margin-left:auto;color:var(--sun);font-weight:800}
+@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes floatup{from{opacity:1;transform:translate(-50%,0) scale(.8)}to{opacity:0;transform:translate(-50%,-90px) scale(1.3)}}
+/* Bố cục full màn hình: sidebar trái như claude.ai, nội dung giữa rộng tối đa 768px; điện thoại dùng thanh tab dưới */
+html,body{height:100%}
+body{padding:0;margin:0;overflow:hidden}
+.shell{display:flex;height:100%;height:100dvh}
+.side{width:260px;flex:0 0 260px;background:#FBF4F4;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px;gap:2px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 16px;font-family:var(--display);font-weight:800;font-size:1.15rem;color:var(--text)}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--sun);color:#fff;display:grid;place-items:center;font-style:normal;font-size:.9rem}
+.nav{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:10px;font-weight:600;color:var(--text)}
+.nav:hover{background:var(--panel2)}
+.nav.on{background:#fff;color:var(--sun);box-shadow:0 1px 4px rgba(120,20,30,.1)}
+.nav b{width:22px;text-align:center;font-family:var(--display)}
+.sidefoot{margin-top:auto;padding:12px;font-size:.82rem;color:var(--muted)}
+.main{flex:1;min-width:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.wrap{max-width:768px;margin:0 auto;padding:0 32px 64px}
+.tabbar{display:none}
+@media (max-width:860px){
+ .side{display:none}
+ .wrap{padding:0 16px 96px}
+ .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;backdrop-filter:blur(8px)}
+ .tabbar button{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.68rem;font-weight:600;color:var(--muted);padding:4px 0}
+ .tabbar button b{font-family:var(--display);font-size:1.05rem}
+ .tabbar button.on{color:var(--sun)}
+ body.insess .tabbar{display:none}
+ .snd{bottom:78px}
+ body.insess .snd{bottom:14px}
+}
+.top{margin:0 -32px;padding:12px 32px 10px}
+@media (max-width:860px){.top{margin:0 -16px;padding:12px 16px 10px}}
+.pagehead{padding:22px 0 4px}
+.pagehead h1{font-size:1.7rem;font-weight:800}
+.pagehead p{color:var(--muted);margin:6px 0 0}
+.seg{display:flex;gap:6px;background:var(--panel);padding:4px;border-radius:12px;margin:14px 0}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:9px 6px;font-weight:700;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--sun);box-shadow:0 1px 4px rgba(120,20,30,.12)}
+.tlist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.tlist{grid-template-columns:1fr}}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(120,20,30,.06)}
+.tcard:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(228,0,43,.14)}
+.tcard h3{font-size:1.08rem}
+.src{font-size:.75rem;color:var(--muted)}
+.meter{height:6px;border-radius:9px;background:var(--panel2);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--sun)}
+.wcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.wcard .wt{flex:1;min-width:0}
+.wcard b{font-family:var(--display);font-size:1.08rem}
+.wcard i{display:block;color:var(--muted);font-size:.9rem}
+.spk{border:2px solid var(--line);background:#fff;border-radius:50%;width:38px;height:38px;flex:0 0 38px;color:var(--sun);font-weight:800}
+.stack{display:flex;flex-direction:column;gap:10px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--line);margin-right:6px}
+.dot.m{background:var(--ok)}
+.flip{perspective:1000px;margin:18px 0}
+.flip .in{position:relative;min-height:240px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.flip.on .in{transform:rotateY(180deg)}
+.flip .fc{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;gap:8px}
+.flip .front{background:linear-gradient(135deg,#E4002B,#B8001F);color:#fff}
+.flip .front b{font-family:var(--display);font-size:2.2rem}
+.flip .back{background:#fff;border:2px solid var(--line);transform:rotateY(180deg)}
+.flip .back b{font-size:1.4rem;font-family:var(--display);color:var(--sun)}
+.media{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.media .mh{display:flex;gap:10px;align-items:center}
+.media .thumb{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;font-family:var(--display);flex:0 0 46px}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--panel2);color:var(--deep)}
+.task{display:flex;gap:10px;align-items:flex-start;font-size:.93rem}
+.task input{margin-top:4px;accent-color:var(--sun);width:18px;height:18px}
+.ans{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ans label{display:flex;align-items:center;gap:6px;font-weight:700;font-size:.9rem}
+.ans input{flex:1;min-width:0;padding:8px;border-radius:9px;border:2px solid var(--line);font:inherit}
+.ans input.r{border-color:var(--ok);background:#E3F8EE}
+.ans input.w{border-color:var(--bad);background:#FDE9E7}
+textarea.inp{min-height:220px;resize:vertical;line-height:1.6}
+.band{font-family:var(--display);font-size:3rem;font-weight:800;color:var(--sun)}
+table.res{width:100%;border-collapse:collapse;font-size:.92rem}
+table.res td,table.res th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+.mount svg{max-height:200px;margin:0 auto}
+.side{padding-top:calc(14px + env(safe-area-inset-top))}.top{padding-top:calc(12px + env(safe-area-inset-top))}.pagehead,.sess{padding-top:calc(22px + env(safe-area-inset-top))}</style></head><body><div class="shell"><aside class="side" id="side"></aside><main class="main" id="main"><div class="wrap" id="app"></div></main></div><nav class="tabbar" id="tabbar" aria-label="Điều hướng"></nav><script>
+// w = từ, vi = nghĩa, ex = ví dụ, b = chủ đề
+const VOCAB=[
+{w:"benefit",vi:"lợi ích",ex:"Regular exercise has many health benefits.",b:"Health"},
+{w:"improve",vi:"cải thiện",ex:"I want to improve my English this year.",b:"Study"},
+{w:"increase",vi:"tăng lên",ex:"The number of cars has increased sharply.",b:"Task 1"},
+{w:"decrease",vi:"giảm xuống",ex:"Sales decreased slightly in March.",b:"Task 1"},
+{w:"environment",vi:"môi trường",ex:"Plastic bags harm the environment.",b:"Environment"},
+{w:"pollution",vi:"ô nhiễm",ex:"Air pollution is a serious problem in big cities.",b:"Environment"},
+{w:"government",vi:"chính phủ",ex:"The government should invest in public transport.",b:"Society"},
+{w:"advantage",vi:"ưu điểm",ex:"One advantage of online learning is flexibility.",b:"Essay"},
+{w:"disadvantage",vi:"nhược điểm",ex:"A major disadvantage is the high cost.",b:"Essay"},
+{w:"experience",vi:"kinh nghiệm, trải nghiệm",ex:"She has five years of teaching experience.",b:"Work"},
+{w:"opportunity",vi:"cơ hội",ex:"Studying abroad gives young people great opportunities.",b:"Education"},
+{w:"necessary",vi:"cần thiết",ex:"It is necessary to book a table in advance.",b:"Daily life"},
+{w:"popular",vi:"phổ biến",ex:"Cycling is popular among students.",b:"Daily life"},
+{w:"develop",vi:"phát triển",ex:"Technology develops very fast.",b:"Technology"},
+{w:"communicate",vi:"giao tiếp",ex:"Children communicate with friends through apps.",b:"Technology"},
+{w:"traffic",vi:"giao thông",ex:"Heavy traffic makes me late for work.",b:"City"},
+{w:"crowded",vi:"đông đúc",ex:"The city centre is always crowded at weekends.",b:"City"},
+{w:"expensive",vi:"đắt đỏ",ex:"Housing is very expensive in Ho Chi Minh City.",b:"City"},
+{w:"recommend",vi:"giới thiệu, đề xuất",ex:"I recommend visiting Da Lat in winter.",b:"Speaking"},
+{w:"suggest",vi:"gợi ý",ex:"I suggest taking the early train.",b:"Speaking"},
+{w:"require",vi:"yêu cầu, đòi hỏi",ex:"This job requires good communication skills.",b:"Work"},
+{w:"reduce",vi:"giảm bớt",ex:"We should reduce plastic waste.",b:"Environment"},
+{w:"damage",vi:"gây hại, thiệt hại",ex:"Smoking damages your lungs.",b:"Health"},
+{w:"habit",vi:"thói quen",ex:"Reading before bed is a good habit.",b:"Daily life"},
+{w:"influence",vi:"ảnh hưởng",ex:"Social media influences teenagers a lot.",b:"Society"},
+{w:"average",vi:"trung bình",ex:"The average age of students is twenty.",b:"Task 1"},
+{w:"approximately",vi:"xấp xỉ, khoảng",ex:"Approximately 40% of people use buses.",b:"Task 1"},
+{w:"according to",vi:"theo như",ex:"According to the chart, tea sales rose.",b:"Task 1"},
+{w:"depend on",vi:"phụ thuộc vào",ex:"Success depends on hard work.",b:"Essay"},
+{w:"avoid",vi:"tránh",ex:"Try to avoid sugary drinks.",b:"Health"}
+];
+// Nghe: máy đọc câu (text), hỏi 1 câu. Đọc kèm transcript sau khi trả lời.
+const LISTEN=[
+{text:"The library opens at eight thirty on weekdays, but on Saturdays it opens at ten.",q:"What time does the library open on Saturday?",opts:["8:30","10:00","8:00","9:30"],a:1,why:"Cuối tuần mở lúc ten (10:00). 8:30 là ngày thường."},
+{text:"I'd like to book a double room for three nights, starting from the fifteenth of June.",q:"How many nights does the speaker want?",opts:["Two","Five","Three","Fifteen"],a:2,why:"Three nights = 3 đêm. Fifteen là ngày (15/6)."},
+{text:"The meeting has been moved from Tuesday to Thursday because the manager is travelling.",q:"When is the meeting now?",opts:["Tuesday","Thursday","Wednesday","Friday"],a:1,why:"Moved from Tuesday TO Thursday: ngày mới là thứ Năm."},
+{text:"Please bring your passport and two photos. You don't need to bring any money today.",q:"What does the speaker say you do NOT need?",opts:["Passport","Photos","Money","Both photos"],a:2,why:"Don't need ... any money. Hãy chú ý từ phủ định (don't, not, no)."},
+{text:"The museum is next to the bank, opposite the post office.",q:"Where is the museum?",opts:["Opposite the bank","Next to the bank","Next to the post office","Behind the bank"],a:1,why:"Next to = bên cạnh. Opposite (đối diện) là bưu điện."},
+{text:"The course costs two hundred and fifty dollars, but students get a twenty percent discount.",q:"Who gets a discount?",opts:["Everyone","Teachers","Students","Nobody"],a:2,why:"Students get 20% discount. Số tiền 250 là giá gốc."},
+{text:"Our flight was delayed by two hours, so we didn't arrive until almost midnight.",q:"Why did they arrive late?",opts:["Bad weather","The flight was delayed","They missed the bus","The airport was closed"],a:1,why:"Delayed = trễ chuyến. Nhớ cặp: delayed → late."},
+{text:"I usually go jogging in the morning, but this week I've been going in the evening because it's too hot.",q:"Why does the speaker jog in the evening this week?",opts:["It's too cold","It's too hot","Work is busy","She is tired"],a:1,why:"Because it's too hot. Từ nối because chỉ lý do."}
+];
+// Chép chính tả: nghe và gõ lại
+const DICT=[
+"I have lived here for three years.",
+"The weather is getting warmer every year.",
+"She works at a small company near the station.",
+"Could you tell me how to get to the airport?",
+"Many students prefer studying in the evening.",
+"The price of food has increased recently."
+];
+const TFN=["True","False","Not Given"];
+const READ=[
+{title:"Cycling to work",text:"More people in the city now cycle to work. A survey of 500 office workers found that 30% cycle at least twice a week, compared with only 12% five years ago. Most of them said cycling is faster than driving because of heavy traffic. Some also said it saves money. However, many workers who do not cycle said the roads are not safe enough. The city council plans to build 40 kilometres of new bike lanes by 2028.",
+qs:[
+{q:"30% of workers cycle to work at least twice a week.",opts:TFN,a:0,why:"Đoạn văn nói đúng: 30% cycle at least twice a week."},
+{q:"Cycling is cheaper than taking the bus.",opts:TFN,a:2,why:"Chỉ nói cycling saves money, không so sánh với xe buýt → Not Given."},
+{q:"All non-cyclists think the roads are safe.",opts:TFN,a:1,why:"Nhiều người không đạp xe nói đường chưa đủ an toàn → False."}]},
+{title:"A new school library",text:"Greenfield School opened a new library last month. It has space for 200 students and more than 10,000 books. The library is open from 7:30 a.m. to 6 p.m. and students can borrow up to five books for two weeks. There is also a quiet room for exam revision and a computer area with twenty computers. The principal said she hopes the library will help students enjoy reading more.",
+qs:[
+{q:"How many books can a student borrow?",opts:["Two","Five","Ten","Twenty"],a:1,why:"borrow up to five books. Twenty là số máy tính, two là số tuần."},
+{q:"The library is open until 6 p.m.",opts:TFN,a:0,why:"Open from 7:30 a.m. to 6 p.m. → True."},
+{q:"The library has a café for students.",opts:TFN,a:2,why:"Không nhắc đến café → Not Given."}]},
+{title:"Sleep and teenagers",text:"Doctors say teenagers need between eight and ten hours of sleep each night. However, many teenagers sleep for only six or seven hours because they stay up late using phones. Lack of sleep can make it difficult to concentrate and may lead to lower exam results. Some schools in the United States have started classes later in the morning, and early studies suggest that students there feel more awake and perform better.",
+qs:[
+{q:"How much sleep do teenagers need?",opts:["6 to 7 hours","8 to 10 hours","10 to 12 hours","5 to 6 hours"],a:1,why:"between eight and ten hours. 6–7 giờ là mức nhiều bạn thực tế ngủ."},
+{q:"Why do many teenagers sleep less?",opts:["Homework","Noise at home","Using phones late","Early classes"],a:2,why:"stay up late using phones."},
+{q:"All schools now start later.",opts:TFN,a:1,why:"Chỉ some schools in the US → False."}]}
+];
+// Ngữ pháp: chọn câu đúng
+const GRAM=[
+{q:"Chọn câu đúng:",opts:["He go to school every day.","He goes to school every day.","He going to school every day.","He gone to school every day."],a:1,why:"Chủ ngữ số ít (he) ở hiện tại đơn → động từ thêm -s: goes."},
+{q:"Chọn câu đúng:",opts:["There is many people here.","There are many people here.","There be many people here.","There was many people here."],a:1,why:"many people là số nhiều → There are."},
+{q:"Chọn câu đúng:",opts:["I have lived here since three years.","I have lived here for three years.","I live here for three years.","I am living here since 2023."],a:1,why:"for + khoảng thời gian (3 years); since + mốc thời gian (2023)."},
+{q:"Chọn câu đúng:",opts:["She is more taller than me.","She is taller than me.","She is tallest than me.","She is more tall than me."],a:1,why:"Tính từ ngắn: taller than, không thêm more."},
+{q:"Chọn câu đúng:",opts:["Yesterday I go to the market.","Yesterday I going to the market.","Yesterday I went to the market.","Yesterday I have gone to the market."],a:2,why:"Yesterday → quá khứ đơn: went."},
+{q:"Chọn câu đúng:",opts:["The informations are useful.","The information is useful.","The information are useful.","The informations is useful."],a:1,why:"information không đếm được → luôn là is, không thêm s."},
+{q:"Chọn câu đúng:",opts:["I am interesting in music.","I am interested in music.","I am interest in music.","I am interested at music."],a:1,why:"interested in: cảm thấy hứng thú. interesting: thú vị (mô tả vật)."},
+{q:"Chọn câu đúng:",opts:["If it rains, I will stay home.","If it will rain, I will stay home.","If it rains, I stayed home.","If it rain, I will stay home."],a:0,why:"Điều kiện loại 1: If + hiện tại đơn, will + động từ."},
+{q:"Chọn câu đúng:",opts:["The number of cars have risen.","The number of cars has risen.","The number of car has risen.","The numbers of cars has risen."],a:1,why:"The number of ... đi với động từ số ít: has."},
+{q:"Chọn câu đúng:",opts:["I look forward to meet you.","I look forward to meeting you.","I look forward meeting you.","I look forward to met you."],a:1,why:"look forward to + V-ing."}
+];
+// Sắp xếp từ thành câu
+const ORDER=[
+{words:["Sales","increased","slightly","in","March"],a:"Sales increased slightly in March."},
+{words:["I","would","like","to","book","a","table"],a:"I would like to book a table."},
+{words:["The","number","of","students","has","risen"],a:"The number of students has risen."},
+{words:["In","my","opinion","technology","is","helpful"],a:"In my opinion technology is helpful."},
+{words:["There","are","many","advantages","of","studying","abroad"],a:"There are many advantages of studying abroad."},
+{words:["Air","pollution","is","a","serious","problem"],a:"Air pollution is a serious problem."},
+{words:["I","have","been","learning","English","for","two","years"],a:"I have been learning English for two years."}
+];
+// Nói: part, câu hỏi, gợi ý, bài mẫu, cụm hữu ích
+const SPEAK=[
+{part:"Part 1",q:"Where do you live? Do you like it?",tips:["Trả lời 2 câu: nơi ở + lý do","Thêm 1 ví dụ cụ thể"],model:"I live in Ho Chi Minh City. I like it because there are lots of restaurants and it's easy to find a job. However, it's quite crowded, especially at rush hour.",phr:["I live in...","I like it because...","However, it's quite..."]},
+{part:"Part 1",q:"What do you usually do in your free time?",tips:["Nói thói quen: usually, sometimes","Thêm lý do bạn thích"],model:"In my free time I usually watch films or go for a walk. I find it relaxing, and it helps me forget about work.",phr:["I usually...","I find it relaxing","It helps me..."]},
+{part:"Part 1",q:"Do you prefer to study in the morning or in the evening?",tips:["Chọn 1 bên, đưa 2 lý do"],model:"I prefer studying in the evening because it's quieter and I can concentrate better. In the morning I'm often too sleepy.",phr:["I prefer ... because...","I can concentrate better","I'm often too..."]},
+{part:"Part 1",q:"What kind of food do you like?",tips:["Kể 1 món + vì sao","Dùng tính từ: tasty, spicy, fresh"],model:"I love Vietnamese food, especially pho. It's tasty and not too expensive. I often have it for breakfast on weekends.",phr:["I love...","especially...","I often have it..."]},
+{part:"Part 2",q:"Describe a place you enjoy visiting. Say where it is, what you do there, and why you like it.",tips:["Nói đủ 3 ý theo gợi ý","Dùng quá khứ nếu kể lần đi","Nói đủ 1 phút, đừng im lặng"],model:"I'd like to talk about a café near my house. It's a small place with lots of plants. I go there on weekends to read and drink coffee. I like it because it's calm and the staff are friendly.",phr:["I'd like to talk about...","It's a ... place with...","The reason I like it is..."]},
+{part:"Part 2",q:"Describe a person who helped you. Say who this person is, how you know them, and how they helped you.",tips:["Bắt đầu: Someone who helped me is...","Kể 1 sự việc cụ thể"],model:"Someone who helped me a lot is my older sister. When I was struggling with my studies, she explained difficult lessons patiently. Thanks to her, I passed my exam.",phr:["Someone who helped me is...","Thanks to her/him...","I'm really grateful"]},
+{part:"Part 3",q:"Why do some people prefer to live in big cities?",tips:["Đưa 2 lý do: job, convenience","Dùng: One reason is that..."],model:"One reason is that big cities offer more job opportunities. Another reason is that services like hospitals and schools are more convenient.",phr:["One reason is that...","Another reason is...","offer more opportunities"]},
+{part:"Part 3",q:"Do you think technology has made life easier?",tips:["Nêu quan điểm + 1 mặt trái","Dùng: On the one hand / On the other hand"],model:"Yes, I think so. On the one hand, we can communicate and work faster. On the other hand, some people spend too much time on their phones.",phr:["On the one hand...","On the other hand...","spend too much time on..."]}
+];
+VOCAB.push(
+{w:"achieve",vi:"đạt được",ex:"She worked hard to achieve her goal.",b:"Study"},
+{w:"attitude",vi:"thái độ",ex:"A positive attitude helps you learn faster.",b:"Society"},
+{w:"available",vi:"có sẵn",ex:"Free Wi-Fi is available in the library.",b:"Daily life"},
+{w:"challenge",vi:"thử thách",ex:"Learning a new language is a big challenge.",b:"Study"},
+{w:"community",vi:"cộng đồng",ex:"The community built a new park together.",b:"Society"},
+{w:"consume",vi:"tiêu thụ",ex:"Teenagers consume too much sugar.",b:"Health"},
+{w:"contribute",vi:"đóng góp",ex:"Everyone can contribute to a cleaner city.",b:"Society"},
+{w:"convenient",vi:"tiện lợi",ex:"Online shopping is very convenient.",b:"Technology"},
+{w:"culture",vi:"văn hóa",ex:"I enjoy learning about other cultures.",b:"Society"},
+{w:"decline",vi:"suy giảm",ex:"The number of visitors declined last year.",b:"Task 1"},
+{w:"effective",vi:"hiệu quả",ex:"Short daily lessons are very effective.",b:"Study"},
+{w:"encourage",vi:"khuyến khích",ex:"Teachers should encourage students to ask questions.",b:"Education"},
+{w:"equipment",vi:"thiết bị",ex:"The gym has modern equipment.",b:"Health"},
+{w:"evidence",vi:"bằng chứng",ex:"There is strong evidence that exercise improves mood.",b:"Essay"},
+{w:"factor",vi:"yếu tố",ex:"Price is an important factor when buying a phone.",b:"Essay"},
+{w:"flexible",vi:"linh hoạt",ex:"My job has flexible working hours.",b:"Work"},
+{w:"generation",vi:"thế hệ",ex:"The older generation prefers printed books.",b:"Society"},
+{w:"global",vi:"toàn cầu",ex:"Global warming affects every country.",b:"Environment"},
+{w:"goal",vi:"mục tiêu",ex:"My goal is to reach band six.",b:"Study"},
+{w:"income",vi:"thu nhập",ex:"Her monthly income is quite low.",b:"Work"},
+{w:"individual",vi:"cá nhân",ex:"Each individual can make a difference.",b:"Society"},
+{w:"knowledge",vi:"kiến thức",ex:"Reading widely increases your knowledge.",b:"Education"},
+{w:"lifestyle",vi:"lối sống",ex:"A healthy lifestyle includes good sleep.",b:"Health"},
+{w:"limit",vi:"giới hạn",ex:"There is a limit to how much I can spend.",b:"Daily life"},
+{w:"method",vi:"phương pháp",ex:"This method helps me remember new words.",b:"Study"},
+{w:"modern",vi:"hiện đại",ex:"Modern cities have many tall buildings.",b:"City"},
+{w:"obvious",vi:"rõ ràng",ex:"The answer was obvious to everyone.",b:"Essay"},
+{w:"overcome",vi:"vượt qua",ex:"He overcame his fear of speaking in public.",b:"Study"},
+{w:"patient",vi:"kiên nhẫn",ex:"You need to be patient when learning English.",b:"Study"},
+{w:"period",vi:"khoảng thời gian",ex:"Prices rose over a period of five years.",b:"Task 1"},
+{w:"prevent",vi:"ngăn ngừa",ex:"Vaccines prevent many serious diseases.",b:"Health"},
+{w:"process",vi:"quá trình",ex:"Learning is a slow process.",b:"Study"},
+{w:"produce",vi:"sản xuất",ex:"The factory produces thousands of bikes a year.",b:"Work"},
+{w:"promote",vi:"thúc đẩy, quảng bá",ex:"The campaign promotes healthy eating.",b:"Society"},
+{w:"protect",vi:"bảo vệ",ex:"We must protect forests for future generations.",b:"Environment"},
+{w:"provide",vi:"cung cấp",ex:"The school provides free lunch for students.",b:"Education"},
+{w:"rapid",vi:"nhanh chóng",ex:"The city has seen rapid growth.",b:"Task 1"},
+{w:"regular",vi:"đều đặn",ex:"Regular exercise keeps you fit.",b:"Health"},
+{w:"relationship",vi:"mối quan hệ",ex:"A good relationship with colleagues makes work easier.",b:"Work"},
+{w:"research",vi:"nghiên cứu",ex:"Recent research shows that sleep affects memory.",b:"Education"},
+{w:"resource",vi:"tài nguyên",ex:"Water is a valuable natural resource.",b:"Environment"},
+{w:"responsible",vi:"chịu trách nhiệm",ex:"Parents are responsible for their children.",b:"Society"},
+{w:"society",vi:"xã hội",ex:"Technology has changed society a lot.",b:"Society"},
+{w:"solution",vi:"giải pháp",ex:"Public transport is one solution to traffic jams.",b:"City"},
+{w:"strategy",vi:"chiến lược",ex:"Good time management is a useful study strategy.",b:"Study"},
+{w:"support",vi:"hỗ trợ",ex:"My family supports my decision to study abroad.",b:"Daily life"},
+{w:"survey",vi:"khảo sát",ex:"The survey asked 200 people about their diet.",b:"Task 1"},
+{w:"tradition",vi:"truyền thống",ex:"Giving lucky money at Tet is a tradition.",b:"Society"},
+{w:"urban",vi:"thuộc đô thị",ex:"Urban areas are growing quickly.",b:"City"},
+{w:"various",vi:"đa dạng",ex:"The market sells various kinds of fruit.",b:"Daily life"},
+{w:"volunteer",vi:"tình nguyện viên",ex:"She works as a volunteer at the hospital.",b:"Society"},
+{w:"waste",vi:"rác thải, lãng phí",ex:"We produce too much plastic waste.",b:"Environment"},
+{w:"wealthy",vi:"giàu có",ex:"Wealthy people often live in the city centre.",b:"Society"}
+);
+VOCAB.push(
+{w:"appointment",vi:"cuộc hẹn",ex:"I have a dentist appointment at three o'clock.",b:"Giao tiếp"},
+{w:"receipt",vi:"biên lai, hóa đơn",ex:"Please keep the receipt in case you want a refund.",b:"Giao tiếp"},
+{w:"refund",vi:"hoàn tiền",ex:"Can I get a refund for this shirt?",b:"Giao tiếp"},
+{w:"reservation",vi:"đặt chỗ",ex:"I made a reservation for four people at seven.",b:"Giao tiếp"},
+{w:"discount",vi:"giảm giá",ex:"Students get a ten percent discount.",b:"Giao tiếp"},
+{w:"deadline",vi:"hạn chót",ex:"The deadline for the report is Friday.",b:"Giao tiếp"},
+{w:"schedule",vi:"lịch trình",ex:"I have a very busy schedule this week.",b:"Giao tiếp"},
+{w:"apologize",vi:"xin lỗi",ex:"I apologize for being late.",b:"Giao tiếp"},
+{w:"complain",vi:"phàn nàn",ex:"He complained about the noise in the hotel.",b:"Giao tiếp"},
+{w:"borrow",vi:"mượn",ex:"Can I borrow your pen for a moment?",b:"Giao tiếp"},
+{w:"queue",vi:"hàng người xếp hàng",ex:"There was a long queue outside the cinema.",b:"Giao tiếp"},
+{w:"ticket",vi:"vé",ex:"I bought two tickets for the concert.",b:"Giao tiếp"},
+{w:"luggage",vi:"hành lý",ex:"Where can I leave my luggage?",b:"Giao tiếp"},
+{w:"destination",vi:"điểm đến",ex:"Da Nang is a popular holiday destination.",b:"Giao tiếp"},
+{w:"journey",vi:"chuyến đi dài",ex:"The journey from Hanoi to Hue took twelve hours.",b:"Giao tiếp"},
+{w:"neighbour",vi:"hàng xóm",ex:"My neighbour often helps me with shopping.",b:"Giao tiếp"},
+{w:"recipe",vi:"công thức nấu ăn",ex:"I found a simple recipe for chicken soup.",b:"Giao tiếp"},
+{w:"cuisine",vi:"ẩm thực",ex:"Vietnamese cuisine is famous around the world.",b:"Giao tiếp"},
+{w:"mood",vi:"tâm trạng",ex:"I'm in a good mood today.",b:"Giao tiếp"},
+{w:"relax",vi:"thư giãn",ex:"I like to relax by listening to music.",b:"Giao tiếp"},
+{w:"exhausted",vi:"kiệt sức",ex:"After the trip I felt completely exhausted.",b:"Giao tiếp"},
+{w:"delay",vi:"trì hoãn, làm trễ",ex:"Bad weather delayed the flight.",b:"Giao tiếp"},
+{w:"cancel",vi:"hủy",ex:"They had to cancel the meeting.",b:"Giao tiếp"},
+{w:"confirm",vi:"xác nhận",ex:"Please confirm your booking by email.",b:"Giao tiếp"}
+);
+const DEF={"benefit": "something that aids or promotes well-being", "improve": "to make better", "increase": "become bigger or greater in amount", "decrease": "decrease in size, extent, or range", "environment": "the totality of surrounding conditions", "pollution": "undesirable state of the natural environment being contaminated with harmful substances as a consequence of human activities", "government": "the organization that is the governing authority of a political unit", "advantage": "the quality of having a superior or more favorable position", "disadvantage": "the quality of having an inferior or less favorable position", "experience": "the accumulation of knowledge or skill that results from direct participation in events or activities", "opportunity": "a possibility due to a favorable combination of circumstances", "necessary": "absolutely essential", "popular": "regarded with great favor, approval, or affection especially by the general public", "develop": "make something new, such as a product or a mental or artistic creation", "communicate": "transmit information", "traffic": "the aggregation of things coming and going in a particular locality during a specified period of time", "crowded": "overfilled or compacted or concentrated", "expensive": "high in price or charging high prices", "recommend": "express a good opinion of", "suggest": "make a proposal, declare a plan for something", "require": "consider obligatory; request and expect", "reduce": "cut down on; make a reduction in", "damage": "inflict damage upon", "habit": "an established custom", "influence": "have and exert influence or effect", "average": "an intermediate scale value regarded as normal or usual", "approximately": "imprecise but fairly close to correct", "depend on": "be contingent on", "avoid": "stay clear from; keep away from; keep out of the way of someone or something", "achieve": "to gain with effort", "attitude": "a complex mental state involving beliefs and feelings and values and dispositions to act in certain ways", "available": "obtainable or accessible and ready for use or service", "challenge": "a demanding or stimulating situation", "community": "a group of people living in a particular local area", "consume": "use up", "contribute": "contribute to some cause", "convenient": "suited to your comfort or purpose or needs", "culture": "a particular society at a particular time and place", "decline": "change toward something smaller or lower", "effective": "producing or capable of producing an intended result or having a striking effect", "encourage": "inspire with confidence; give hope or courage to", "equipment": "an instrumentality needed for an undertaking or to perform a service", "evidence": "your basis for belief or disbelief; knowledge on which to base belief", "factor": "anything that contributes causally to a result", "flexible": "able to adjust readily to different conditions", "generation": "all the people living at the same time or of approximately the same age", "global": "involving the entire earth; not limited or provincial in scope", "goal": "the state of affairs that a plan is intended to achieve and that terminates behavior intended to achieve it", "income": "the financial gain accruing over a given period of time", "individual": "a human being", "knowledge": "the psychological result of perception and learning and reasoning", "lifestyle": "a manner of living that reflects the person's values and attitudes", "limit": "the greatest possible degree of something", "method": "a way of doing something, especially a systematic way; implies an orderly logical arrangement", "modern": "belonging to the modern era; since the Middle Ages", "obvious": "easily perceived by the senses or grasped by the mind", "overcome": "get on top of; deal with successfully", "patient": "enduring trying circumstances with even temper or characterized by such endurance", "period": "an amount of time", "prevent": "keep from happening or arising; make impossible", "process": "a particular course of action intended to achieve a result", "produce": "bring forth or yield", "promote": "contribute to the progress or growth of", "protect": "shield from danger, injury, destruction, or damage", "provide": "give something useful or necessary to", "rapid": "done or occurring in a brief period of time", "regular": "in accordance with fixed order or procedure or principle", "relationship": "a relation between people;", "research": "systematic investigation to establish facts", "resource": "available source of wealth; a new or reserve supply that can be drawn upon when needed", "responsible": "worthy of or requiring responsibility or trust; or held accountable", "society": "an extended social group having a distinctive cultural and economic organization", "solution": "a method for solving a problem", "strategy": "an elaborate and systematic plan of action", "support": "be behind; approve of", "survey": "make a survey of; for statistical purposes", "tradition": "an inherited pattern of thought or action", "urban": "relating to or concerned with a city or densely populated area", "various": "having great diversity or variety", "volunteer": "a person who performs voluntary work", "waste": "any materials unused and rejected as worthless or unwanted", "wealthy": "having an abundant supply of money or possessions of value", "appointment": "the act of putting a person into a non-elective position", "receipt": "the act of receiving", "refund": "money returned to a payer", "reservation": "a district that is reserved for particular purpose", "discount": "the act of reducing the selling price of merchandise", "deadline": "the point in time at which something must be completed", "schedule": "a temporally organized plan for matters to be attended to", "apologize": "acknowledge faults or shortcomings or failing", "complain": "express complaints, discontent, displeasure, or unhappiness", "borrow": "get temporarily", "queue": "a line of people or vehicles waiting for something", "ticket": "a commercial document showing that the holder is entitled to something", "luggage": "cases used to carry belongings when traveling", "destination": "the place designated as the end", "journey": "the act of traveling from one place to another", "neighbour": "a person who lives near another", "recipe": "directions for making something", "cuisine": "the practice or manner of preparing food or the food so prepared", "mood": "a characteristic state of feeling", "relax": "become less tense, rest, or take one's ease", "exhausted": "drained of energy or effectiveness; extremely tired; completely exhausted", "delay": "cause to be slowed down or delayed", "cancel": "postpone indefinitely or annul something that was scheduled", "confirm": "establish or strengthen as with new evidence or facts", "chilly": "appreciably or disagreeably cold", "cloud": "any collection of particles or gases that is visible", "degree": "a position on a scale of intensity or amount or quality", "fog": "droplets of water vapor suspended in the air near the ground", "foggy": "filled or abounding with fog or mist", "icy": "extremely cold", "lightning": "abrupt electric discharge from cloud to cloud or from cloud to earth accompanied by the emission of light", "pour": "rain heavily", "shower": "a brief period of precipitation", "storm": "a violent weather condition with winds 64-72 knots and precipitation and thunder and lightning", "thunderstorm": "a storm resulting from strong rising air currents; heavy rain or hail along with thunder and lightning", "windy": "abounding in or exposed to the wind or breezes", "clever": "mentally quick and resourceful; ; -Bram Stoker", "confident": "having or marked by confidence or assurance", "creative": "having the ability or power to create", "dishonest": "deceptive or fraudulent; disposed to cheat or defraud or deceive", "generous": "willing to give and share unstintingly", "honest": "not disposed to cheat or defraud; not deceptive or fraudulent", "impatient": "restless or short-tempered under delay or opposition", "intelligent": "having the capacity for thought and reason especially to a high degree", "lazy": "disinclined to work or exertion", "mean": "characterized by or indicative of lack of generosity", "pleasant": "affording pleasure; being in harmony with your taste or likings", "reliable": "worthy of reliance or trust", "sensible": "showing reason or sound judgment", "talented": "endowed with talent or talents", "unreliable": "liable to be erroneous or misleading", "anxiety": "a relatively permanent state of worry and nervousness occurring in a variety of mental disorders, usually accompanied by compulsive behavior or attacks of panic", "cheerful": "being full of or promoting cheer; having or showing good spirits", "confused": "perplexed by many conflicting situations or statements; filled with bewilderment", "curiosity": "a state in which you want to learn more about something", "depressed": "filled with melancholy and despondency", "emotion": "any strong feeling", "frightened": "made afraid", "hopeful": "having or manifesting hope", "jealous": "suspicious or unduly suspicious or fearful of being displaced by a rival", "miserable": "very unhappy; full of misery", "proud": "feeling self-respect or pleasure in something by which you measure your self-worth; or being a reason for pride", "scared": "made afraid", "stress": "difficulty that causes worry or emotional tension; ; - R.J.Samuelson", "upset": "afflicted with or marked by anxious uneasiness or trouble or grief", "adult": "a fully developed person from maturity onward", "allow": "make a possibility or provide opportunity for; permit to be attainable or cause to remain", "birth": "the event of being born", "childhood": "the time of person's life when they are a child", "elderly": "advanced in years;", "middle-aged": "being roughly between 45 and 65 years old", "nearly": "slightly short of or not quite accomplished; all but", "retired": "no longer active in your work or profession", "retirement": "the state of being retired from one's business or occupation", "roughly": "imprecise but fairly close to correct", "teenager": "a juvenile between the onset of puberty and maturity", "toddler": "a young child", "bother": "cause annoyance in; disturb, especially by minor irritations", "cereal": "a breakfast food prepared from grain", "fall asleep": "change from a waking to a sleeping state", "housework": "the work of cleaning and running a house", "instead": "in place of, or as an alternative to", "ironing": "the work of using heat to smooth washed clothes in order to remove any wrinkles", "luckily": "by good fortune", "spare time": "time available for hobbies and other activities that you enjoy", "wake up": "cause to become awake or conscious", "work out": "do physical exercise", "go out": "leave the house to go somewhere", "apartment": "a suite of rooms usually on one floor of an apartment house", "balcony": "a platform projecting from the wall of a building and surrounded by a balustrade or railing or parapet", "central heating": "a heating system in which air or water is heated at a central furnace and sent through the building via vents or pipes and radiators", "charming": "pleasing or delighting", "cottage": "a small house with a single story", "downstairs": "on or of lower floors of a building", "rent": "a payment or series of payments made by the lessee to an owner for use of some property, facility, equipment, or service", "space": "an empty area", "upstairs": "the part of a building above the ground floor", "view": "the visual percept of a region", "move": "change residence, affiliation, or place of employment", "furniture": "furnishings that make a room or other area ready for occupancy", "afford": "be able to spare or give up", "bank account": "a fund that a customer has entrusted to a bank and from which the customer can make withdrawals", "charge": "demand payment", "deposit": "a partial payment made at the time of purchase; the balance to be paid later", "earn": "earn on some commercial or business transaction; earn as salary or wages", "fee": "a fixed charge for a privilege or for professional services", "hire": "hold under a lease or rental agreement; of goods and services", "loan": "the temporary provision of money", "owe": "be obliged to pay or repay", "reasonable": "showing reason or sound judgment", "save": "accumulate money for future use", "waste of money": "money spent for inadequate return", "ache": "a dull persistent pain", "backache": "an ache localized in the back", "bandage": "a piece of soft material that covers and protects an injured part of the body", "bleed": "lose blood from one's body", "cough": "a sudden noisy expulsion of air from the lungs that clears the air passages; a common symptom of upper respiratory infection or bronchitis or pneumonia or tuberculosis", "flu": "an acute febrile highly contagious viral disease", "headache": "pain in the head caused by dilation of cerebral arteries or muscle contractions or a reaction to drugs", "hurt": "feel physical pain", "illness": "impairment of normal physiological function affecting part or all of an organism", "medicine": "something that treats or prevents or alleviates the symptoms of disease", "operation": "a medical procedure involving an incision with instruments; performed to repair damage or arrest disease in a living body", "pain": "a symptom of some physical hurt or disorder", "painful": "causing physical or psychological pain", "pill": "a dose of medicine in the form of a small pellet", "sore throat": "inflammation of the fauces and pharynx", "beef": "cattle that are reared for their meat", "bitter": "causing a sharp and acrid taste experience", "flavour": "the taste experience when a savoury condiment is taken into the mouth", "garlic": "bulbous herb of southern Europe widely naturalized; bulb breaks up into separate strong-flavored cloves", "grapes": "any of various juicy fruit of the genus Vitis with green or purple skins; grow in clusters", "pork": "meat from a domestic hog or pig", "prawns": "any of various edible decapod crustaceans", "salmon": "any of various large food and game fishes of northern waters; usually migrate from salt to fresh water to spawn", "spinach": "southwestern Asian plant widely cultivated for its succulent edible dark green leaves", "vinegar": "sour-tasting liquid produced usually by oxidation of the alcohol in wine or cider and used as a condiment or food preservative", "boil": "immerse or be immersed in a boiling liquid, often for cooking purposes", "fry": "cook on a hot surface using fat", "roast": "a piece of meat roasted or for roasting and of a size for slicing into more than one portion", "raw": "not treated with heat to prepare it for eating", "ingredient": "a component of a mixture or compound", "crime rate": "the ratio of crimes in an area to the population of that area; expressed per 1000 population per year", "cultural": "of or relating to the arts and manners that a group favors", "dull": "lacking in liveliness or animation", "rush hour": "the times at the beginning and end of the working day when many people are traveling to or from work", "safe": "free from danger or the risk of harm", "stressful": "extremely irritating to the nerves", "traffic jam": "a number of vehicles blocking one another until they can scarcely move", "variety": "a collection containing a variety of sorts of things", "farming": "the practice of cultivating the land or raising stock", "field": "a piece of land cleared of trees and usually enclosed", "footpath": "a trodden path", "hill": "a local and well-defined elevation of the land", "scenery": "the appearance of a place", "season": "a period of the year marked by special events or activities in some field", "sunset": "the time in the evening at which the sun begins to fall below the horizon", "valley": "a long depression in the surface of the land that usually contains a river", "village": "a community of people smaller than a town", "plant": "a living organism lacking the power of locomotion", "peaceful": "not disturbed by strife or turmoil or war", "cyclist": "a person who rides a bicycle", "fare": "the sum charged for riding in a public conveyance", "get on": "get on board of", "public transport": "conveyance for passengers or mail or freight", "taxi rank": "a place where taxis park while awaiting customers", "vehicle": "a conveyance that transports people or objects", "commute": "a regular journey of some distance to and from your place of work", "abroad": "in a foreign country", "accommodation": "living quarters provided for public convenience", "book": "arrange for and reserve in advance", "cruise": "an ocean trip taken for pleasure", "ferry": "a boat that transports people or vehicles across a body of water and operates on a regular schedule", "flight": "an instance of traveling by air", "foreign": "of concern to or concerning the affairs of other nations", "harbour": "a sheltered port where ships can take on or discharge cargo", "nearby": "close at hand", "pack": "arrange in a container", "passport": "a document issued by a country to a citizen allowing that person to travel abroad and re-enter the home country", "platform": "a raised horizontal surface", "resort": "a hotel located in a resort area", "souvenir": "something of sentimental value", "trip": "a journey for some purpose", "package holiday": "a tour arranged by a travel agent; transportation and food and lodging are all provided at an inclusive price", "sightseeing": "going about to look at places of interest", "apologise": "acknowledge faults or shortcomings or failing", "close": "close in relevance or relationship", "couple": "a pair who associate with one another", "divorced": "of someone whose marriage has been legally dissolved", "grateful": "feeling or showing gratitude", "guest": "a visitor to whom hospitality is extended", "independent": "free from external control and constraint", "introduce": "cause to come to know personally", "loyal": "steadfast in allegiance or duty", "neighbourhood": "a surrounding or nearby region", "ordinary": "not exceptional in any way especially in quality or ability or size or degree", "private": "confined to particular persons or groups or providing privacy", "recognise": "detect with the senses", "relation": "a person related by blood or marriage", "respect": "an attitude of admiration or esteem", "stranger": "anyone who does not belong in the environment in which they are found", "trust": "complete confidence in a person or plan etc", "brain": "that part of the central nervous system that includes all the higher nervous centers; enclosed within the skull; continuous with the spinal cord", "concentrate": "direct one's attention on something", "consider": "deem to be", "course": "education imparted in a series of lessons or meetings", "expert": "a person with special knowledge or ability who performs skillfully", "fail": "fail to get a passing grade", "guess": "expect, believe, or suppose", "hesitate": "pause or hold back in uncertainty or unwillingness", "instruction": "a message describing how something is to be done", "make sure": "make a point of doing something; act purposefully and intentionally", "mental": "involving the mind or an intellectual process", "qualification": "an attribute that must be met or complied with and that fits a person for something", "remind": "put in the mind of someone", "revise": "make revisions in", "skill": "an ability that has been acquired by training", "subject": "a branch of knowledge", "term": "a limited period of time", "wonder": "have a wish or desire to know something", "accent": "distinctive manner of oral expression", "fluent": "expressing yourself readily, clearly, effectively", "candidate": "someone who is considered for something", "atmosphere": "a particular environment or surrounding influence", "primary school": "a school for young children; usually the first 6 or 8 grades", "secondary school": "a school for students intermediate between elementary school and college; usually grades 9 to 12", "punish": "impose a penalty on; inflict punishment on", "pupil": "a learner who is enrolled in an educational institution", "timetable": "a schedule listing events and the times at which they will take place", "uniform": "clothing of distinctive design worn by members of a particular group as a means of identification", "vocational training": "training for a specific vocation in industry or agriculture or trade", "certificate": "a document attesting to the truth of certain stated facts", "graduate": "a person who has received a degree from a school", "lecturer": "someone who lectures professionally", "postgraduate": "a student who continues studies after graduation", "undergraduate": "a university student who has not yet received a first degree", "experiment": "the act of conducting a controlled test or investigation", "qualified": "meeting the proper standards and requirements and training for an office or position or task", "profession": "the body of people in a learned occupation", "accountant": "someone who maintains and audits business accounts", "engineer": "a person who uses scientific knowledge to solve practical problems", "lawyer": "a professional person authorized to practice law; conducts lawsuits or gives legal advice", "application": "a verbal or written request for assistance or employment or admission to a school", "employ": "engage or hire for work", "interview": "the questioning of a person; often conducted by journalists", "part-time": "involving less than the standard or customary time for an activity", "quit": "put an end to a state or an activity", "resign": "leave voluntarily", "training": "activity leading to skilled behavior", "unemployment": "the state of being unemployed or not having a job", "career": "the particular occupation for which you are trained", "colleague": "an associate that one works with", "athlete": "a person trained to compete in sports", "athletics": "a contest between athletes", "camping": "the act of encamping and living in tents in a camp", "gym": "athletic facility equipped for sports or physical training", "jogging": "running at a jog trot as a form of cardiopulmonary exercise", "race": "any competition", "rock climbing": "the sport or pastime of scaling rock masses on mountain sides", "sailing": "riding in a sailboat", "competition": "an occasion on which a winner is selected from among two or more contestants", "opponent": "a contestant that you are matched against", "referee": "the chief official who is expected to ensure fair play", "score": "a number that expresses the accomplishment of a team or an individual in a game or contest", "team": "a cooperative unit", "train": "undergo training or instruction in preparation for a particular role, function, or profession", "acting": "the performance of a part or role in a drama", "director": "the person who directs the making of a film", "entertainment": "an activity that is diverting and that holds the attention", "fiction": "a literary work based on the imagination and not necessarily on fact", "literature": "creative writing of recognized artistic value", "novel": "an extended fictional work in prose; usually in the form of a story", "science fiction": "literary fantasy involving the imagined impact of science on society", "thriller": "a suspenseful adventure story or play or movie", "album": "one or more recordings issued together; originally released on 12-inch phonograph records and later on cassette audiotape and compact disc", "audience": "a gathering of spectators or listeners at a performance", "composer": "someone who composes music as a profession", "lyrics": "the text of a popular song or musical-comedy number", "perform": "carry out or perform an action", "performance": "a dramatic or musical entertainment", "tune": "a succession of notes forming a distinctive sequence", "rhythm": "the basic rhythmic unit in a piece of music", "advertisement": "a public promotion of some product or service", "article": "nonfictional prose forming an independent part of a publication", "broadcast": "message that is transmitted by radio or television", "celebrity": "a widely known person", "documentary": "a film or TV program presenting the facts about a person or event", "headline": "the heading or caption of a newspaper article", "journalist": "a writer for newspapers and magazines", "podcast": "distribute over the internet for playback on a mobile device or a personal computer", "publish": "put into print", "reporter": "a person who investigates and reports or edits news stories", "series": "similar things placed in order or happening one after another", "soap opera": "a serialized program usually dealing with sentimentalized family matters that is broadcast on radio or television", "weather forecast": "a forecast of the weather", "back up": "make a copy of especially for storage in another place as a security copy", "document": "writing that provides information", "password": "a secret word or phrase known only to a restricted group", "virus": "ultramicroscopic infectious agent that replicates itself only within cells of living hosts; many are pathogenic; a piece of nucleic acid wrapped in a thin coat of protein", "access": "the right to enter", "blog": "a shared on-line journal where people can post diary entries about their personal experiences and hobbies", "browse": "look around casually and randomly, without seeking anything in particular", "delete": "remove or make invisible", "download": "transfer a file or program from a central computer to a smaller computer or to a computer at a remote location", "upload": "transfer a file or program to a central computer from a smaller computer or a computer at a remote location", "junk mail": "third-class mail consisting of advertising and often addressed to `resident' or `occupant'", "website": "a computer connected to the internet that maintains a series of web pages on the World Wide Web", "climate change": "a change in the world's climate", "drought": "a shortage of rainfall", "efficient": "being effective without wasting time or effort or expense", "energy": "any source of usable power", "excessive": "beyond normal limits", "exist": "have an existence, be extant", "global warming": "an increase in the average temperature of the earth's atmosphere", "greenhouse gases": "a gas that contributes to the greenhouse effect by absorbing infrared radiation", "switch off": "cause to stop operating by disengaging a switch", "throw away": "throw or cast away", "flood": "the rising of a body of water and its overflowing onto normally dry land", "recycle": "use again after processing", "renewable": "that can be renewed or extended", "however": "despite anything to the contrary", "eventually": "after an unspecified period of time or an especially long delay", "first of all": "before anything else", "in the end": "after a very lengthy period of time", "in case": "if there happens to be need", "consequently": "because of the reason given", "on the whole": "with everything considered", "point of view": "a mental position from which things are viewed", "on the other hand": "from another point of view"};
+// Hội thoại: [tên, [[câu người kia nói (máy đọc), [đáp án đúng, sai, sai, sai], giải thích]...]]
+const DIALOGS=[
+["Quán cà phê",[
+["Hi there! What can I get for you?",["I'd like a latte, please.","I want latte.","Give me latte now.","Yes, I can."],"I'd like..., please = cách gọi món lịch sự. I want... nghe hơi cộc."],
+["Would you like that hot or iced?",["Iced, please.","Yes, hot.","I am iced.","No, thank you, I like."],"Câu hỏi lựa chọn (A or B) thì trả lời thẳng một lựa chọn."],
+["Anything else?",["That's all, thanks.","I am fine.","Not at all.","Yes, I am."],"That's all, thanks = vậy là đủ rồi. Cách chốt đơn tự nhiên nhất."],
+["That'll be four fifty.",["Can I pay by card?","I pay you four.","How many?","Here is four fifty, goodbye."],"Can I...? dùng để hỏi xin phép lịch sự."]]],
+["Hỏi đường",[
+["You look lost. Can I help?",["Yes, please. How do I get to the station?","I go station.","No, you are lost.","Where is you?"],"How do I get to...? = cách hỏi đường chuẩn."],
+["Go straight, then turn left at the traffic lights.",["Sorry, could you repeat that?","Repeat!","I turn left lights.","Thank you, no."],"Không nghe kịp thì hỏi lại: Sorry, could you repeat that? Rất hữu ích cả khi thi Nói."],
+["It's about a five-minute walk.",["Great, thanks a lot!","That is five.","Walking is good, I am.","You are welcome."],"Người ta chỉ đường xong thì cảm ơn: Great, thanks a lot!"],
+["No problem. Have a nice day!",["You too!","Same to me day.","Yes, I have.","Thank you for have."],"You too! = bạn cũng vậy nhé. Ngắn gọn, tự nhiên."]]],
+["Đặt bàn qua điện thoại",[
+["Good evening, Sunset Restaurant. How can I help?",["Hello, I'd like to book a table for four, please.","I want eat tonight.","Table four.","Are you open?"],"book a table for + số người là cụm cần nhớ."],
+["What time would you like?",["Around seven thirty, if possible.","Seven thirty o'clock at.","Yes, seven.","At seven thirty I am."],"Around + giờ = khoảng mấy giờ; if possible làm câu mềm hơn."],
+["Could I take your name, please?",["It's Linh. L-I-N-H.","I am name Linh.","Linh is me.","My name call Linh."],"Nghe điện thoại thường phải đánh vần tên. Luyện đọc bảng chữ cái nhé."],
+["Great, you're all booked for seven thirty.",["Perfect, thank you very much.","Finish.","Booked me.","I am welcome."],"Perfect, thank you very much = kết thúc cuộc gọi lịch sự."]]],
+["Đổi hàng trong cửa hiệu",[
+["Hi, is everything okay with your purchase?",["Actually, it's too small. Can I exchange it?","This is bad, give money.","Small. Change.","I no like."],"exchange = đổi hàng. Dùng Actually để mở lời nhẹ nhàng."],
+["Do you have the receipt?",["Yes, here you are.","Yes, I have you.","No receipt is here.","I am receipt."],"Here you are = đây ạ, khi đưa vật gì cho người khác."],
+["Would you like a refund or a different size?",["A larger size, please.","I like large.","Yes, larger.","Refund size."],"Chọn một trong hai: nói rõ điều mình muốn + please."],
+["Here you go. Anything else?",["No, that's everything. Thank you!","Yes, no.","I am fine, thanks you.","It's okay."],"That's everything = chỉ vậy thôi. Lưu ý thank you, không phải thanks you."]]],
+["Làm quen đồng nghiệp",[
+["Hi, I'm Tom. Are you new here?",["Hi Tom, I'm Mai. Yes, I just started this week.","Yes I am new.","I am Mai new.","Hello, no."],"Giới thiệu tên và trả lời thêm một ý: câu dài hơn thì điểm Nói cao hơn."],
+["Nice to meet you. What do you do?",["I work in an office. How about you?","I am work office.","Office.","I do work."],"Hỏi ngược lại How about you? giúp cuộc trò chuyện trôi chảy."],
+["I'm a teacher. Do you like your job?",["Yes, it's interesting, though it can be stressful.","Yes, like.","My job is like.","I am liking very."],"Trả lời + thêm lý do (though... = tuy nhiên). Cực hợp Speaking Part 1."],
+["That's great. We should grab a coffee sometime.",["Sure, that sounds good!","Coffee is sometime.","I grab you.","Yes, I am coffee."],"grab a coffee = đi uống cà phê. Sure, that sounds good! là câu nhận lời."]]],
+["Gọi đặt lịch khám",[
+["Good morning, City Clinic. How can I help?",["Hello, I'd like to make an appointment, please.","I want see doctor tomorrow.","Doctor please.","I sick, quick."],"make an appointment = đặt lịch hẹn."],
+["Which day suits you best?",["Would Thursday morning be possible?","Thursday is me.","Any day I am.","I suits Thursday."],"Would ... be possible? = hỏi lịch lịch sự."],
+["I'm afraid Thursday morning is full. How about the afternoon?",["That works for me. Thanks.","No afternoon.","Afternoon what?","I am afraid, too."],"That works for me = tôi ổn với lịch đó."],
+["Can I have your phone number to confirm?",["Sure, it's 0912 345 678.","Yes, phone number have.","Number is me 0912.","Phone is no."],"Khi đọc số điện thoại, đọc từng chữ số và ngắt nhịp theo nhóm."]]],
+["Ở sân bay",[
+["Good morning. May I see your passport and ticket?",["Of course, here you are.","Yes, I show.","See is okay.","Passport my."],"Of course, here you are = đây ạ."],
+["Would you like a window or an aisle seat?",["A window seat, please.","I like window seat is.","Windows.","Yes, seat."],"window seat = ghế cạnh cửa sổ, aisle = ghế sát lối đi."],
+["Do you have any luggage to check in?",["Just this one suitcase.","Luggage is suitcase me.","I check in luggage no.","Yes, the airplane."],"check in luggage = ký gửi hành lý."],
+["Your flight is delayed by an hour. Sorry for the inconvenience.",["That's okay. Thanks for letting me know.","It is delay me.","You are sorry.","No problem, you delayed."],"delayed = bị hoãn. Phản hồi bình tĩnh và lịch sự."]]],
+["Góp ý nhẹ nhàng ở nhà hàng",[
+["Is everything all right with your meal?",["Actually, my soup is a bit cold. Could you heat it up, please?","This soup is bad!","Cold. Fix.","Yes, soup."],"a bit cold + Could you...? giúp phàn nàn nhẹ nhàng, không gay gắt."],
+["I'm so sorry. I'll bring a new one right away.",["Thank you, I appreciate it.","You must be sorry.","Okay, quick.","Yes, you are."],"I appreciate it = tôi trân trọng việc bạn làm."],
+["Here you are. Is that better?",["Much better, thanks!","It is better me.","Better than you.","Yes, I am better."],"Much better = tốt hơn nhiều rồi."],
+["Would you like to see the dessert menu?",["Maybe next time. Could we have the bill, please?","No dessert, bill.","Bill.","I am dessert."],"Maybe next time = lần sau nhé; the bill = hóa đơn thanh toán."]]]
+];
+// Cụm nói tự nhiên: [nhóm, mẹo IELTS, [[English, Tiếng Việt]...]]
+const PHRASES=[
+["Chào hỏi, làm quen","Dùng ngay ở Speaking Part 1 và Listening Section 1.",[
+["Nice to meet you.","Rất vui được gặp bạn."],
+["How's it going?","Dạo này thế nào?"],
+["What do you do for a living?","Bạn làm nghề gì?"],
+["I'm originally from Can Tho.","Quê mình ở Cần Thơ."],
+["Long time no see!","Lâu rồi không gặp!"]]],
+["Nghe không kịp thì làm gì","Dùng được khi thi Nói và khi giao tiếp thật. Giám khảo thích thí sinh biết hỏi lại.",[
+["Sorry, could you say that again?","Xin lỗi, bạn nói lại được không?"],
+["I didn't catch that.","Mình chưa nghe kịp."],
+["Could you speak a bit more slowly?","Bạn nói chậm hơn một chút được không?"],
+["What does that word mean?","Từ đó nghĩa là gì?"],
+["How do you spell that?","Từ đó đánh vần thế nào?"]]],
+["Mua sắm, ăn uống","Thường gặp trong Listening Section 1 (hội thoại đời thường).",[
+["I'd like to order, please.","Cho mình gọi món."],
+["Could I have the bill, please?","Cho mình tính tiền."],
+["Do you have this in a larger size?","Cái này có size lớn hơn không?"],
+["Is there a discount for students?","Có giảm giá cho sinh viên không?"],
+["Can I pay by card?","Mình trả bằng thẻ được không?"]]],
+["Hỏi đường, đi lại","Dùng khi đi du lịch và gặp trong Listening với bản đồ.",[
+["How do I get to the airport?","Đi đến sân bay như thế nào?"],
+["Is it far from here?","Chỗ đó có xa đây không?"],
+["Turn left at the traffic lights.","Rẽ trái ở chỗ đèn giao thông."],
+["It's opposite the post office.","Nó nằm đối diện bưu điện."]]],
+["Câu giờ khi nói IELTS","Giúp bạn có thời gian nghĩ mà vẫn nói trôi chảy. Đừng im lặng quá 2 giây.",[
+["That's an interesting question.","Câu hỏi hay đấy."],
+["Let me think for a moment.","Để mình nghĩ một chút."],
+["Well, to be honest...","Thật lòng mà nói thì..."],
+["What I mean is...","Ý mình là..."],
+["How can I put it?","Nói thế nào nhỉ?"]]],
+["Nêu ý kiến, đưa ví dụ","Dùng trong Speaking Part 3 và Writing Task 2.",[
+["In my opinion...","Theo ý kiến của tôi..."],
+["I tend to think that...","Mình có xu hướng nghĩ rằng..."],
+["For example, ...","Ví dụ như..."],
+["On the other hand, ...","Mặt khác thì..."],
+["That's why I believe...","Đó là lý do mình tin rằng..."]]]
+];
+// Bốn nhóm dùng cho câu hỏi dịch nhanh
+const ALLPH=PHRASES.flatMap(g=>g[2]);
+// Danh sách từ theo chủ đề, chọn từ mục lục/index của sách. Nghĩa tiếng Việt do app soạn.
+// [mã, tên chủ đề, cấp (1 = 4.5→5.0, 2 = 5.0→5.5), nguồn, "từ=nghĩa|..."]
+const TOPICS=[
+["weather","Thời tiết",1,"Vocabulary in Use · Unit 7","boiling=nóng như thiêu|chilly=se lạnh|cloud=mây|degree=độ (nhiệt độ)|fog=sương mù|foggy=có sương mù|freezing=lạnh cóng|icy=đóng băng, buốt giá|lightning=tia chớp|pour=mưa như trút|shower=cơn mưa rào|storm=cơn bão|sunny=nắng|thunderstorm=giông bão|windy=nhiều gió"],
+["character","Tính cách",1,"Vocabulary in Use · Unit 11","clever=thông minh, lanh lợi|confident=tự tin|creative=sáng tạo|dishonest=không trung thực|generous=hào phóng|hard-working=chăm chỉ|honest=trung thực|impatient=thiếu kiên nhẫn|intelligent=thông minh|lazy=lười biếng|mean=keo kiệt; xấu tính|pleasant=dễ chịu|reliable=đáng tin cậy|sensible=biết điều, khôn ngoan|talented=tài năng|unreliable=không đáng tin"],
+["feelings","Cảm xúc",1,"Vocabulary in Use · Unit 12","anxiety=sự lo âu|cheerful=vui vẻ|confused=bối rối|curiosity=sự tò mò|depressed=chán nản, trầm uất|disappointed=thất vọng|emotion=cảm xúc|frightened=sợ hãi|hopeful=đầy hy vọng|jealous=ghen tị|miserable=khổ sở|proud=tự hào|scared=sợ|stress=căng thẳng|upset=buồn bực"],
+["growing","Lớn lên & tuổi tác",1,"Vocabulary in Use · Unit 14","adult=người lớn|allow=cho phép|birth=sự ra đời|childhood=tuổi thơ|elderly=cao tuổi|middle-aged=trung niên|nearly=gần như|retired=đã nghỉ hưu|retirement=sự nghỉ hưu|roughly=khoảng chừng|teenager=thiếu niên|toddler=trẻ mới biết đi"],
+["routine","Sinh hoạt hằng ngày",1,"Vocabulary in Use · Unit 16","bother=làm phiền; bận tâm|cereal=ngũ cốc ăn sáng|fall asleep=ngủ thiếp đi|housework=việc nhà|instead=thay vào đó|ironing=việc ủi đồ|luckily=may mắn thay|main meal=bữa chính|spare time=thời gian rảnh|stay in=ở nhà|wake up=thức dậy|work out=tập thể dục|go out=đi chơi"],
+["home","Nhà ở",1,"Vocabulary in Use · Units 17–18","apartment=căn hộ|balcony=ban công|block of flats=chung cư|central heating=hệ thống sưởi|charming=duyên dáng, dễ thương|cottage=nhà nhỏ ở quê|downstairs=tầng dưới|lift=thang máy|rent=thuê; tiền thuê|space=không gian|upstairs=tầng trên|view=quang cảnh|move=chuyển nhà|furniture=đồ nội thất"],
+["money","Tiền bạc",1,"Vocabulary in Use · Unit 19","afford=có đủ tiền|bank account=tài khoản ngân hàng|charge=tính phí|deposit=tiền đặt cọc|earn=kiếm (tiền)|fee=lệ phí|hire=thuê (tạm thời)|loan=khoản vay|owe=nợ|reasonable=hợp lý (giá)|save=tiết kiệm|value for money=đáng đồng tiền|waste of money=phí tiền"],
+["health","Sức khỏe",1,"Vocabulary in Use · Unit 20","ache=cơn đau âm ỉ|backache=đau lưng|bandage=băng gạc|bleed=chảy máu|cough=ho|flu=cảm cúm|headache=đau đầu|hurt=làm đau, bị đau|illness=bệnh tật|medicine=thuốc|operation=ca phẫu thuật|pain=cơn đau|painful=đau đớn|pill=viên thuốc|sore throat=đau họng|suffer from=mắc (bệnh)"],
+["food","Đồ ăn",1,"Vocabulary in Use · Units 24–25","beef=thịt bò|bitter=đắng|flavour=hương vị|garlic=tỏi|grapes=nho|pork=thịt heo|prawns=tôm|salmon=cá hồi|spinach=rau chân vịt|vinegar=giấm|boil=luộc, đun sôi|fry=chiên|roast=nướng (lò)|raw=sống (chưa nấu)|ingredient=nguyên liệu"],
+["city","Cuộc sống thành phố",1,"Vocabulary in Use · Unit 26","crime rate=tỷ lệ tội phạm|cultural=thuộc văn hóa|dull=buồn tẻ|in a hurry=vội vàng|rush hour=giờ cao điểm|safe=an toàn|stressful=căng thẳng|town centre=trung tâm thị trấn|traffic jam=kẹt xe|variety=sự đa dạng|nowhere to park=không có chỗ đỗ xe"],
+["country","Vùng quê",1,"Vocabulary in Use · Unit 27","farming=nông nghiệp|field=cánh đồng|footpath=đường mòn|hill=ngọn đồi|scenery=phong cảnh|season=mùa|sunset=hoàng hôn|valley=thung lũng|village=làng|plant=cây; trồng cây|peaceful=yên bình|fresh air=không khí trong lành"],
+["transport","Giao thông",1,"Vocabulary in Use · Unit 28","coach=xe khách|cyclist=người đi xe đạp|fare=giá vé|get on=lên (xe buýt, tàu)|miss the bus=lỡ chuyến xe buýt|public transport=phương tiện công cộng|reliable=đáng tin cậy, đúng giờ|return=vé khứ hồi|taxi rank=bến taxi|vehicle=phương tiện|commute=đi lại hằng ngày (đi làm)"],
+["travel","Du lịch",1,"Destination B1 · Unit 9 + Vocabulary in Use · Units 46–51","abroad=ở nước ngoài|accommodation=chỗ ở|book=đặt (vé, phòng)|cruise=du thuyền|destination=điểm đến|ferry=phà|flight=chuyến bay|foreign=nước ngoài|harbour=bến cảng|journey=hành trình|luggage=hành lý|nearby=gần đó|pack=đóng gói hành lý|passport=hộ chiếu|platform=sân ga|resort=khu nghỉ dưỡng|souvenir=quà lưu niệm|trip=chuyến đi|package holiday=tour trọn gói|sightseeing=tham quan"],
+["people","Mối quan hệ",1,"Destination B1 · Unit 12","apologise=xin lỗi|close=thân thiết|confident=tự tin|couple=cặp đôi|divorced=đã ly hôn|generous=hào phóng|grateful=biết ơn|guest=khách|independent=độc lập|introduce=giới thiệu|loyal=trung thành|neighbourhood=khu phố|ordinary=bình thường|private=riêng tư|recognise=nhận ra|relation=họ hàng; mối quan hệ|respect=tôn trọng|stranger=người lạ|trust=tin tưởng"],
+["study1","Học tập & thi cử",1,"Destination B1 · Unit 6 + Vocabulary in Use · Unit 33","achieve=đạt được|brain=bộ não|concentrate=tập trung|consider=cân nhắc|course=khóa học|expert=chuyên gia|fail=trượt, thất bại|guess=đoán|hesitate=do dự|instruction=hướng dẫn|make progress=tiến bộ|make sure=đảm bảo|mental=thuộc tinh thần|pass=đậu, vượt qua|qualification=bằng cấp|remind=nhắc nhở|revise=ôn tập|skill=kỹ năng|subject=môn học|term=học kỳ|wonder=tự hỏi|accent=giọng|fluent=trôi chảy|candidate=thí sinh"]
+];
+TOPICS.push(
+["school","Trường học & đại học",2,"Vocabulary in Use · Units 32, 34","atmosphere=bầu không khí|primary school=trường tiểu học|secondary school=trường trung học|punish=phạt|pupil=học sinh|timetable=thời khóa biểu|uniform=đồng phục|vocational training=đào tạo nghề|certificate=chứng chỉ|degree=bằng đại học|graduate=tốt nghiệp; cử nhân|lecturer=giảng viên|postgraduate=sau đại học|undergraduate=sinh viên đại học|experiment=thí nghiệm|do research=làm nghiên cứu|qualified=đủ trình độ"],
+["jobs","Việc làm & sự nghiệp",2,"Vocabulary in Use · Units 35–37","profession=nghề nghiệp|accountant=kế toán|engineer=kỹ sư|lawyer=luật sư|apply for=nộp đơn xin|application=đơn xin việc|employ=tuyển dụng|interview=phỏng vấn|part-time=bán thời gian|pay rise=tăng lương|promote=thăng chức|quit=nghỉ việc|resign=từ chức|training=đào tạo|unemployment=thất nghiệp|career=sự nghiệp|colleague=đồng nghiệp|salary=lương"],
+["sport","Thể thao & giải trí",2,"Vocabulary in Use · Units 41–42","athlete=vận động viên|athletics=điền kinh|camping=cắm trại|gym=phòng tập|jogging=chạy bộ|keep fit=giữ dáng|race=cuộc đua|rock climbing=leo núi đá|sailing=đi thuyền buồm|competition=cuộc thi|opponent=đối thủ|referee=trọng tài|score=ghi bàn; tỉ số|team=đội|train=luyện tập"],
+["films","Sách, phim & âm nhạc",2,"Vocabulary in Use · Units 43–44","acting=diễn xuất|director=đạo diễn|entertainment=giải trí|fiction=tiểu thuyết hư cấu|horror film=phim kinh dị|literature=văn học|novel=tiểu thuyết|science fiction=khoa học viễn tưởng|thriller=phim ly kỳ|album=album nhạc|audience=khán giả|composer=nhà soạn nhạc|lyrics=lời bài hát|perform=biểu diễn|performance=buổi biểu diễn|tune=giai điệu|rhythm=nhịp điệu"],
+["media","Báo chí & truyền hình",2,"Vocabulary in Use · Unit 52","advertisement=quảng cáo|article=bài báo|broadcast=phát sóng|celebrity=người nổi tiếng|documentary=phim tài liệu|headline=tiêu đề báo|journalist=nhà báo|podcast=chương trình podcast|publish=xuất bản|reality TV show=truyền hình thực tế|reporter=phóng viên|series=loạt phim|soap opera=phim truyền hình dài tập|weather forecast=dự báo thời tiết"],
+["tech","Máy tính & Internet",2,"Vocabulary in Use · Units 54–55","back up=sao lưu|crash=bị treo (máy)|document=tài liệu|password=mật khẩu|print out=in ra|username=tên đăng nhập|virus=vi-rút máy tính|access=truy cập|blog=trang blog|browse=lướt xem|delete=xóa|download=tải xuống|upload=tải lên|go online=lên mạng|junk mail=thư rác|social networking site=mạng xã hội|website=trang web"],
+["climate","Biến đổi khí hậu",2,"Vocabulary in Use · Unit 58","climate change=biến đổi khí hậu|drought=hạn hán|efficient=hiệu quả (tiết kiệm)|energy=năng lượng|excessive=quá mức|exist=tồn tại|global warming=nóng lên toàn cầu|greenhouse gases=khí nhà kính|take action=hành động|switch off=tắt|throw away=vứt đi|flood=lũ lụt|recycle=tái chế|renewable=tái tạo được"],
+["linking","Từ nối cho Writing",2,"Vocabulary in Use · Units 92–94, 97","although=mặc dù|despite=bất chấp|however=tuy nhiên|in spite of=mặc dù|whereas=trong khi (đối lập)|what's more=hơn nữa|eventually=cuối cùng thì|first of all=trước hết|in the end=rốt cuộc|due to=do, bởi vì|in order to=để mà|so that=để cho|in case=phòng khi|as a result=kết quả là|consequently=do đó|on the whole=nhìn chung|in contrast=ngược lại|point of view=quan điểm|on the other hand=mặt khác|compared with=so với"]
+);
+// Kết hợp từ (collocation): chọn theo chủ đề trong English Collocations in Use (Intermediate). Nghĩa do app soạn.
+const COLLO=[
+["make a mistake","mắc lỗi","Động từ cơ bản"],["make a decision","đưa ra quyết định","Động từ cơ bản"],["make an effort","nỗ lực","Động từ cơ bản"],["make progress","tiến bộ","Động từ cơ bản"],["do your best","cố gắng hết sức","Động từ cơ bản"],["do research","làm nghiên cứu","Động từ cơ bản"],["do damage","gây thiệt hại","Động từ cơ bản"],["take action","hành động","Động từ cơ bản"],["take a break","nghỉ giải lao","Động từ cơ bản"],["take part in","tham gia","Động từ cơ bản"],["have fun","vui chơi","Động từ cơ bản"],["pay attention","chú ý","Động từ cơ bản"],["save time","tiết kiệm thời gian","Thời gian"],["waste time","lãng phí thời gian","Thời gian"],["spend time","dành thời gian","Thời gian"],
+["heavy rain","mưa to","Thời tiết"],["strong wind","gió mạnh","Thời tiết"],["thick fog","sương mù dày","Thời tiết"],["bright sunshine","nắng chói","Thời tiết"],
+["tiring journey","chuyến đi mệt mỏi","Du lịch"],["aisle seat","ghế cạnh lối đi","Du lịch"],["family-run hotel","khách sạn gia đình tự quản","Du lịch"],["go sightseeing","đi tham quan","Du lịch"],["well worth seeing","rất đáng xem","Du lịch"],
+["heavy traffic","giao thông đông đúc","Thành phố"],["busy street","con đường tấp nập","Thành phố"],["public transport","phương tiện công cộng","Thành phố"],["lined with shops","hai bên đầy cửa hàng","Thành phố"],
+["lose your patience","mất kiên nhẫn","Con người"],["keep a promise","giữ lời hứa","Con người"],["close friend","bạn thân","Con người"],["get on well with","hòa hợp với","Con người"],["only child","con một","Gia đình"],["stable home","gia đình ổn định","Gia đình"],
+["move into a flat","dọn vào căn hộ","Nhà ở"],["spacious living room","phòng khách rộng rãi","Nhà ở"],["nourishing meal","bữa ăn bổ dưỡng","Ăn uống"],["balanced diet","chế độ ăn cân bằng","Ăn uống"],["spoil your appetite","làm mất cảm giác ngon miệng","Ăn uống"],
+["catch a cold","bị cảm lạnh","Sức khỏe"],["take exercise","tập thể dục","Sức khỏe"],["vigorous exercise","tập luyện cường độ cao","Sức khỏe"],["make a full recovery","hồi phục hoàn toàn","Sức khỏe"],
+["give a performance","biểu diễn","Âm nhạc"],["go on tour","đi lưu diễn","Âm nhạc"],["film critic","nhà phê bình phim","Phim ảnh"],
+["attend a lecture","dự bài giảng","Học tập"],["meet a deadline","kịp hạn chót","Học tập"],["first draft","bản nháp đầu tiên","Học tập"],["take notes","ghi chép","Học tập"],["sit an exam","đi thi","Học tập"],["carry out research","tiến hành nghiên cứu","Viết học thuật"],["key factor","yếu tố then chốt","Viết học thuật"],["play a role","đóng vai trò","Viết học thuật"],["have an impact on","có tác động đến","Viết học thuật"],["research suggests","nghiên cứu cho thấy","Viết học thuật"],
+["apply for a job","nộp đơn xin việc","Công việc"],["earn a living","kiếm sống","Công việc"],["hand in your notice","nộp đơn nghỉ việc","Công việc"],["set up a business","thành lập doanh nghiệp","Kinh doanh"],["launch a product","ra mắt sản phẩm","Kinh doanh"],
+["break the law","phạm luật","Xã hội"],["tackle crime","giải quyết tội phạm","Xã hội"],["hit the headlines","lên trang nhất","Tin tức"],["price rises","giá tăng","Tiền bạc"],["save money","tiết kiệm tiền","Tiền bạc"],["eradicate poverty","xóa đói nghèo","Vấn đề toàn cầu"],["protect the environment","bảo vệ môi trường","Vấn đề toàn cầu"],["significant number","con số đáng kể","Số liệu"],["rise sharply","tăng mạnh","Số liệu"],["fall slightly","giảm nhẹ","Số liệu"],["remain stable","giữ ổn định","Số liệu"]
+];
+// Chủ điểm ngữ pháp Destination B1 Units 1, 2, 4 (câu hỏi do app soạn)
+GRAM.push(
+{q:"Chọn câu đúng (thì hiện tại đơn / tiếp diễn):",opts:["Look! It rains.","Look! It is raining.","Look! It has rained.","Look! It rained."],a:1,why:"Look! báo hiệu việc đang diễn ra → hiện tại tiếp diễn."},
+{q:"Chọn câu đúng (động từ trạng thái):",opts:["I am knowing the answer.","I know the answer.","I am know the answer.","I knowing the answer."],a:1,why:"know là động từ trạng thái, không dùng dạng -ing."},
+{q:"Chọn câu đúng:",opts:["She usually is getting up at seven.","She usually gets up at seven.","She is usually get up at seven.","She get usually up at seven."],a:1,why:"usually = thói quen → hiện tại đơn; trạng từ tần suất đứng trước động từ thường."},
+{q:"Chọn câu đúng (quá khứ tiếp diễn):",opts:["I was watching TV when the phone rang.","I watched TV when the phone was ringing.","I was watch TV when the phone rang.","I am watching TV when the phone rang."],a:0,why:"Hành động đang xảy ra (was watching) thì hành động khác xen vào (rang)."},
+{q:"Chọn câu đúng (used to):",opts:["I use to play football every day.","I used to play football when I was young.","I used to playing football.","I was used to play football."],a:1,why:"used to + V nguyên mẫu: thói quen trong quá khứ, nay không còn."},
+{q:"Chọn câu đúng (hiện tại hoàn thành):",opts:["I have seen that film last week.","I saw that film already yesterday.","I have already seen that film.","I have see that film."],a:2,why:"already + hiện tại hoàn thành. Có mốc thời gian cụ thể (last week) thì dùng quá khứ đơn."},
+{q:"Chọn câu đúng (hiện tại hoàn thành tiếp diễn):",opts:["I have been waiting for an hour.","I am waiting for an hour.","I wait since an hour.","I have waiting for an hour."],a:0,why:"Việc bắt đầu trong quá khứ, còn tiếp diễn đến giờ, nhấn mạnh độ dài → have been + V-ing."},
+{q:"Chọn câu đúng:",opts:["Have you ever been to Da Lat?","Did you ever be to Da Lat?","Have you ever went to Da Lat?","Are you ever been to Da Lat?"],a:0,why:"Hỏi trải nghiệm: Have you ever + V3 (been)."}
+);
+const YT=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+// [tên, loại, cấp độ, mô tả, link, [nhiệm vụ], màu]
+const MEDIA=[
+["Peppa Pig","Hoạt hình","Dễ · 4.5","Câu ngắn, giọng Anh rõ, chủ đề gia đình và sinh hoạt. Hợp nhất để bắt đầu.",YT("Peppa Pig full episodes English"),["Xem 1 tập, lần đầu bật phụ đề tiếng Anh","Xem lại không phụ đề","Chép 5 câu bạn nghe được vào sổ"],"#E4387A"],
+["Bluey","Hoạt hình","Dễ–vừa · 4.5–5.0","Giọng Úc tự nhiên, nói nhanh hơn Peppa. Luyện nghe giọng khác giọng Anh-Mỹ.",YT("Bluey full episode English"),["Xem 1 tập (7 phút) có phụ đề","Ghi 3 câu cảm thán, ví dụ Hooray, Oh no","Kể lại nội dung bằng 3 câu tiếng Anh"],"#3D7BD9"],
+["Extra English","Phim cho người học","Vừa · 5.0","Sitcom dành riêng cho người học tiếng Anh, tình huống đời thường, nói chậm và rõ.",YT("Extra English episode 1"),["Xem 1 tập, dừng sau mỗi đoạn để đoán câu tiếp theo","Ghi 5 cụm từ giao tiếp","Đọc theo nhân vật 1 đoạn"],"#12A66B"],
+["Pixar & Disney shorts","Hoạt hình ngắn","Vừa · 5.0","Phim ngắn 3–8 phút, ít thoại, dễ kể lại. Luyện Speaking Part 2: kể chuyện.",YT("Pixar short film full"),["Xem 1 phim ngắn","Kể lại bằng tiếng Anh trong 1 phút (bấm giờ)","Dùng first, then, after that, finally"],"#7A4CD8"],
+["BBC Learning English · 6 Minute English","Podcast","Vừa · 5.0–5.5","Mỗi bài 6 phút về một chủ đề, có giải thích từ vựng. Rất giống chủ đề IELTS.",YT("BBC Learning English 6 Minute English"),["Nghe 1 bài, lần đầu không nhìn chữ","Ghi 4 từ vựng được giải thích","Trả lời câu hỏi đầu bài người dẫn đưa ra"],"#B8001F"],
+["IELTS Listening practice","Luyện đề","5.0–5.5","Bài luyện nghe theo format thi, 4 Section. Làm khi đã quen nghe hoạt hình.",YT("IELTS listening practice test with answers"),["Làm 1 Section, không dừng băng","Dò đáp án, ghi lại câu sai","Nghe lại đoạn sai và tìm từ khóa"],"#E8700A"]
+];
+const SONGS=[
+["Count on Me","Bruno Mars","Chậm, rõ chữ, từ vựng đơn giản về tình bạn."],
+["Perfect","Ed Sheeran","Nhịp chậm, phát âm rõ. Hợp luyện nối âm."],
+["Let It Be","The Beatles","Lời lặp lại, dễ nhớ. Giọng Anh-Anh."],
+["Someone Like You","Adele","Giọng Anh, câu dài hơn. Thử nghe chép từng câu."],
+["A Thousand Years","Christina Perri","Rất chậm, hợp người mới bắt đầu nghe nhạc."],
+["Photograph","Ed Sheeran","Nhiều câu thì hiện tại và tương lai, dễ học ngữ pháp."],
+["Yesterday","The Beatles","Bài ngắn, thì quá khứ đơn rõ ràng."],
+["Imagine","John Lennon","Chậm, ít từ, nhiều câu điều kiện và mơ ước."]
+];
+const SONG_TASKS=["Nghe 1 lần chỉ để thưởng thức","Mở bản có lời (lyrics), hát theo 1 lần","Tắt lời, nghe lại và ghi 5 từ bạn bắt được","Tra 2 từ mới trong tab Từ điển"];
+// Đề thi thử do app tự soạn theo format IELTS (không lấy từ sách)
+const MOCK={
+listen:[
+{part:"Part 1 · Điền form",audio:"Good morning, Riverside Sports Centre. How can I help you? Hi, I'd like to join the swimming class for beginners. Sure. Can I have your surname, please? Yes, it's Nguyen. N, G, U, Y, E, N. Thank you. And how old are you? I'm twenty-four. The beginner class is on Wednesday evenings, starting at six forty-five. The fee is thirty-two pounds a month. You'll need to bring a towel and a padlock for the locker. Oh, and please bring a photo for your membership card.",
+ qs:[["Surname: ______",["nguyen"]],["Age: ______",["24","twenty-four","twenty four"]],["Class day: ______",["wednesday"]],["Monthly fee: £______",["32","thirty-two","thirty two"]],["Bring a towel, a padlock and a ______",["photo","photograph"]]]},
+{part:"Part 2 · Chọn đáp án",audio:"Welcome to Greenhill Park. Before you start your visit, here is some information. The park opens at eight in the morning and closes at sunset. The café is next to the main entrance, and it serves hot food until two p.m. If you want to see the birds, the best place is the lake on the north side, especially early in the morning. Bicycles can be rented from the visitor centre for five pounds an hour, but they are not allowed in the flower garden. Finally, the guided walk starts at eleven o'clock from the old bridge and lasts about ninety minutes.",
+ qs:[["Hot food is served until:",["12 p.m.","2 p.m.","sunset","8 a.m."],1],["The best place to see birds is:",["the flower garden","the visitor centre","the lake","the old bridge"],2],["Bicycles are NOT allowed:",["at the lake","in the flower garden","near the café","after 2 p.m."],1],["The guided walk lasts about:",["30 minutes","an hour","90 minutes","2 hours"],2],["The guided walk starts from:",["the main entrance","the café","the visitor centre","the old bridge"],3]]}
+],
+read:{title:"The Return of the City Bicycle",
+text:["In the 1950s, bicycles were one of the most common forms of transport in many Asian cities. By the 1990s, however, motorbikes and cars had replaced them in most places, because people wanted to travel faster and further. Today, the bicycle is slowly coming back, and city governments are among its strongest supporters.",
+"The main reason is traffic. In large cities, a car journey of five kilometres can take more than forty minutes during the rush hour. Researchers in one Southeast Asian capital found that, for short journeys, a bicycle was often faster than a car. Bicycles also take up much less space: around ten bicycles can be parked in the space needed for one car.",
+"Health is another factor. Doctors recommend at least 150 minutes of moderate exercise each week, and cycling to work for twenty minutes a day almost reaches this target. A study of office workers found that those who cycled regularly took fewer sick days than those who drove.",
+"However, there are still problems. Many people say that roads are too dangerous for cyclists, and in hot countries, arriving at work sweaty is a real concern. Some companies have responded by providing showers for staff. Bike-sharing schemes, where people can rent a bicycle using a phone app, have also become popular, although in some cities many shared bicycles were damaged or left in the wrong places.",
+"Experts believe that the future of the city bicycle depends on safe bike lanes. When one European city built a network of protected lanes, the number of cyclists doubled in just four years."],
+qs:[
+{t:"tfng",q:"Bicycles were common in many Asian cities in the 1950s.",a:0},
+{t:"tfng",q:"Motorbikes are now cheaper than bicycles.",a:2},
+{t:"tfng",q:"For short journeys, cars are always faster than bicycles.",a:1},
+{t:"tfng",q:"Cycling twenty minutes a day nearly meets the weekly exercise advice.",a:0},
+{t:"gap",q:"About ______ bicycles can park in the space of one car. (một số)",a:["10","ten"]},
+{t:"gap",q:"Some companies provide ______ for staff who cycle. (một từ)",a:["showers","shower"]},
+{t:"mc",q:"What problem with bike-sharing is mentioned?",o:["It is too expensive","Bikes were damaged or left in wrong places","The app does not work","There are not enough bikes"],a:1},
+{t:"mc",q:"According to experts, the future of city cycling depends mainly on:",o:["cheaper bicycles","more companies","safe bike lanes","shorter journeys"],a:2}
+]},
+w1:{q:"The chart below shows the percentage of people using four types of transport to get to work in one city in 2005 and 2025. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+ data:[["Car",42,30],["Motorbike",35,28],["Bus",15,22],["Bicycle",8,20]],
+ tips:["Mở bài: viết lại đề bằng từ của bạn (paraphrase).","Overview: 2 xu hướng lớn nhất, không có số liệu.","Thân bài 1: phương tiện giảm (car, motorbike).","Thân bài 2: phương tiện tăng (bus, bicycle).","Dùng: rose from … to …, fell by …, more than doubled."],
+ model:"The bar chart compares the proportion of people who travelled to work by car, motorbike, bus and bicycle in a city in 2005 and 2025.\n\nOverall, private vehicles became less popular over the period, while public transport and cycling became more common. Cars remained the most popular choice in both years.\n\nIn 2005, cars were used by 42% of workers, but this figure fell to 30% in 2025. Similarly, the percentage of people who rode motorbikes dropped from 35% to 28%.\n\nBy contrast, the share of bus users rose from 15% to 22%. The most significant change was in cycling, which more than doubled from 8% to 20%, making bicycles almost as popular as buses by 2025."},
+w2:{q:"Some people think that the government should spend more money on public transport rather than on building new roads. To what extent do you agree or disagree? Write at least 250 words.",
+ tips:["Mở bài: paraphrase đề + nêu rõ quan điểm (agree / partly agree).","Thân bài 1: lý do 1 + giải thích + ví dụ.","Thân bài 2: lý do 2 (hoặc mặt còn lại).","Kết bài: nhắc lại quan điểm, không thêm ý mới.","Dùng từ nối: Firstly, In addition, However, As a result, In conclusion."],
+ outline:"Gợi ý dàn ý (agree): 1) Phương tiện công cộng chở nhiều người hơn → giảm kẹt xe (ví dụ: một xe buýt thay cho khoảng 40 xe máy). 2) Giảm ô nhiễm không khí và chi phí đi lại cho người thu nhập thấp. 3) Nhượng bộ: vẫn cần sửa đường ở vùng nông thôn nhưng ưu tiên ngân sách cho metro và xe buýt."}
+};
+// Bảng quy đổi điểm → band ước tính (Listening, Academic Reading) theo bảng phổ biến của IELTS
+const BAND_L=[[39,9],[37,8.5],[35,8],[32,7.5],[30,7],[26,6.5],[23,6],[18,5.5],[16,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5],[0,0]];
+const BAND_R=[[39,9],[37,8.5],[35,8],[33,7.5],[30,7],[27,6.5],[23,6],[19,5.5],[15,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5],[0,0]];
+const toBand=(n,t)=>{for(const r of t)if(n>=r[0])return r[1];return 0};
+let SND=true;try{SND=localStorage.getItem('ieltsq_snd')!=='0'}catch(e){}
+let AC=null;
+function beep(f,d,t){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const sfx={ok(){beep(660,.12);setTimeout(()=>beep(880,.16),90)},bad(){beep(190,.25,'square')},win(){[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.22),i*110))}};
+const calm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+function fx(t){if(calm())return;try{const e=document.createElement('div');e.className='fx';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),1000)}catch(e){}}
+function confetti(){
+ if(calm())return;
+ try{const c=document.createElement('canvas');c.id='cf';c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);
+  const x=c.getContext('2d'),cols=['#E4002B','#FF5A70','#FFFFFF','#FFC1C8','#FFC145','#B8001F'];
+  const ps=Array.from({length:110},()=>({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,s:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[Math.floor(Math.random()*cols.length)]}));
+  let f=0;(function tick(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.strokeStyle='#E4002B';x.lineWidth=.5;x.fillRect(-p.s/2,-p.s/3,p.s,p.s*.6);x.restore()});
+   if(++f<100)requestAnimationFrame(tick);else c.remove()})()}catch(e){}}
+function initSnd(){try{const b=document.createElement('button');b.className='snd';b.setAttribute('aria-label','Bật hoặc tắt âm thanh');b.textContent=SND?'♪':'×';
+ b.onclick=()=>{SND=!SND;b.textContent=SND?'♪':'×';try{localStorage.setItem('ieltsq_snd',SND?'1':'0')}catch(e){}};document.body.appendChild(b)}catch(e){}}
+const SK={
+V:{i:"Aa",n:"Từ vựng",c:"var(--cV)",d:"Học từ mới, nhớ lâu"},
+L:{i:"♪",n:"Nghe",c:"var(--cL)",d:"Nghe câu, chép chính tả"},
+R:{i:"≡",n:"Đọc",c:"var(--cR)",d:"True / False / Not Given"},
+W:{i:"✎",n:"Viết",c:"var(--cW)",d:"Ngữ pháp, ghép câu"},
+S:{i:"◉",n:"Nói",c:"var(--cS)",d:"Nói 30–60 giây"},
+C:{i:"☺",n:"Giao tiếp",c:"var(--cC)",d:"Hội thoại đời thường"}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9' ]/g,'').replace(/\s+/g,' ').trim();
+const today=()=>new Date().toLocaleDateString('en-CA');
+function load(){let d={};try{d=JSON.parse(localStorage.getItem('ieltsq')||'{}')}catch(e){}
+ const o=Object.assign({xp:0,streak:0,last:'',sk:{},box:{},badges:[],sess:0,perfect:0,done:{}},d);
+ o.sk=Object.assign({V:0,L:0,R:0,W:0,S:0,C:0},o.sk);return o}
+let S=load();
+function save(){try{localStorage.setItem('ieltsq',JSON.stringify(S))}catch(e){}}
+function day(){const t=today();return S.done[t]||(S.done[t]={xp:0,sk:[],bonus:false})}
+function toast(m){const t=document.createElement('div');t.className='toast pop';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3200)}
+const BADGES=[
+["first","Bước đầu tiên",()=>S.sess>=1],
+["s3","Chuỗi 3 ngày",()=>S.streak>=3],
+["s7","Chuỗi 7 ngày",()=>S.streak>=7],
+["perf","Điểm tuyệt đối",()=>S.perfect>=1],
+["all","Đủ 6 món",()=>Object.values(S.sk).every(v=>v>0)],
+["b5","Band 5.0",()=>S.xp>=500],
+["b55","Band 5.5",()=>S.xp>=1000],
+["b6","Band 6.0",()=>S.xp>=1500]];
+function mountain(){
+ const pts=[[30,108],[120,78],[215,48],[292,18]],lab=["4.5","5.0","5.5","6.0"];
+ const p=Math.min(1,S.xp/1500)*3,i=Math.min(2,Math.floor(p)),f=p-i;
+ const x=pts[i][0]+(pts[i+1][0]-pts[i][0])*f,y=pts[i][1]+(pts[i+1][1]-pts[i][1])*f;
+ const camps=pts.map((q,k)=>`<circle cx="${q[0]}" cy="${q[1]}" r="5" fill="${S.xp>=k*500?'var(--sun)':'var(--line)'}"/><text x="${q[0]}" y="${q[1]+20}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">${lab[k]}</text>`).join('');
+ return `<svg viewBox="0 0 320 130" role="img" aria-label="Bản đồ leo band từ 4.5 đến 6.0"><polygon points="0,130 0,112 60,92 120,62 170,72 230,32 292,8 320,22 320,130" fill="var(--panel2)"/><polyline points="${pts.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="5 5"/>${camps}<circle cx="${x}" cy="${y}" r="9" fill="var(--sun)" stroke="var(--ink)" stroke-width="3"/></svg>`}
+function home(){
+ clearInterval(window.tmr);mark('home');
+ const d=day(),lv=Math.floor(S.xp/100)+1,into=S.xp%100;
+ const bi=Math.min(3,Math.floor(S.xp/500)),band=["4.5","5.0","5.5","6.0"][bi];
+ const left=S.xp>=1500?0:(bi+1)*500-S.xp;
+ const qs=[["Làm 1 bài Từ vựng",d.sk.includes('V')],["Làm 1 bài Nghe, Đọc, Viết hoặc Nói",d.sk.some(k=>k!=='V')],["Kiếm 60 XP hôm nay",d.xp>=60]];
+ $('#app').innerHTML=`
+ <div class="top"><div class="toprow"><span class="lvl">Lv ${lv}</span><div class="xpbar" aria-label="${into} trên 100 XP"><i style="width:${into}%"></i></div><span class="streak">${S.streak} ngày liên tiếp</span></div></div>
+ <div class="hero"><h1>Leo band IELTS</h1><p>Mỗi bài chỉ 5 câu, khoảng 5 phút. Trộn học thuật với giao tiếp đời thường để không bị ngán.</p></div>
+ <div class="mount">${mountain()}<p class="sub" style="margin:8px 0 0">Đang ở Band ${band} · ${S.xp} XP${left?` · còn ${left} XP tới trạm kế`:' · đã chạm đỉnh 6.0'}</p></div>
+ <h2 class="sec">Nhiệm vụ hôm nay (+30 XP khi xong cả 3)</h2>
+ <div class="daily">${qs.map(q=>`<div class="q-item ${q[1]?'done':''}"><span class="chk">${q[1]?'✓':''}</span>${q[0]}</div>`).join('')}</div>
+ <h2 class="sec">Chọn một món <span class="pill" style="vertical-align:middle">Cấp ${S.lv||1} · ${(S.lv||1)===1?"4.5 → 5.0":"5.0 → 5.5"}</span></h2>
+ <div class="grid">${Object.keys(SK).map(k=>`<button class="card" style="--c:${SK[k].c}" onclick="start('${k}')"><span class="ico">${SK[k].i}</span><h3>${SK[k].n}</h3><span class="sub">${SK[k].d}</span><span class="sub">Lv ${Math.floor(S.sk[k]/100)+1}</span><span class="bar"><i style="width:${S.sk[k]%100}%"></i></span></button>`).join('')}
+ <button class="card" style="--c:var(--bad);grid-column:1/-1;min-height:0" onclick="start('B',true)"><span class="ico">!</span><h3>Đấu Boss</h3><span class="sub">8 câu trộn đủ kỹ năng, XP nhân đôi</span></button></div>
+ <h2 class="sec">Huy hiệu</h2>
+ <div class="badges">${BADGES.map(b=>`<span class="badge ${S.badges.includes(b[0])?'':'off'}">${b[1]}</span>`).join('')}</div>
+ <p class="sub" style="margin-top:22px">Mẹo: chán thì đổi món. Xem 1 tập hoạt hình ở tab Phim & nhạc, chơi 1 trò, rồi làm 1 bài Nói. Tiến độ lưu ngay trên trình duyệt này.</p>
+ <p class="sub" style="margin-top:14px;font-size:.8rem">Định nghĩa tiếng Anh lấy từ Princeton WordNet 3.0 (© 2006 Princeton University, dùng theo giấy phép WordNet: wordnet.princeton.edu/license-and-commercial-use). Định nghĩa chính thức đầy đủ xem tại Cambridge Dictionary qua link từng từ. Ví dụ, nghĩa tiếng Việt và hội thoại do app tự soạn.</p>`;
+ toTop()}
+let Q=[],qi=0,ok=0,combo=0,sx=0,by={},mode='',locked=false,boss=false,ord=null,sp=null;
+function mcq(o){if(o.fixed)return Object.assign({kind:'mc'},o);
+ const s=shuf(o.opts.map((t,i)=>i));return Object.assign({kind:'mc'},o,{opts:s.map(i=>o.opts[i]),a:s.indexOf(o.a)})}
+function bV(){
+ return shuf(POOL()).sort((a,b)=>(S.box[a.w]||0)-(S.box[b.w]||0)).slice(0,5).map((v,i)=>{
+  const o=shuf(POOL().filter(x=>x.w!==v.w)).slice(0,3);
+  const base={sk:'V',w:v.w,tag:'Từ vựng'};
+  const re=new RegExp('\\b'+v.w+'\\b','i'),fill=re.test(v.ex),df=DEF[v.w],dok=df&&!re.test(df);
+  const why=`${v.w} = ${v.vi}. Ví dụ: ${v.ex}`+(df?` Định nghĩa: ${df}.`:'');
+  const t=i%4;
+  if(t===3&&dok)return mcq({...base,tag:'Định nghĩa tiếng Anh',q:`Từ nào có nghĩa: "${df}"?`,opts:[v.w,...o.map(x=>x.w)],a:0,why});
+  if(t===1)return mcq({...base,q:`Từ tiếng Anh nào nghĩa là "${v.vi}"?`,opts:[v.w,...o.map(x=>x.w)],a:0,why});
+  if(t===2&&fill)return mcq({...base,tag:'Điền từ',q:v.ex.replace(re,'_____'),opts:[v.w,...o.map(x=>x.w)],a:0,why});
+  return mcq({...base,q:`"${v.w}" nghĩa là gì?`,opts:[v.vi,...o.map(x=>x.vi)],a:0,why})})}
+function bC(){
+ const d=rnd(DIALOGS);
+ const a=d[1].map(t=>mcq({sk:'C',tag:'Hội thoại · '+d[0],audio:t[0],q:'Người kia vừa nói. Bạn đáp lại thế nào?',opts:t[1],a:0,why:t[2],tr:t[0]}));
+ const p=rnd(ALLPH),o=shuf(ALLPH.filter(x=>x[0]!==p[0])).slice(0,3);
+ return [...a,mcq({sk:'C',tag:'Cụm câu',q:`Nói thế nào bằng tiếng Anh: "${p[1]}"`,opts:[p[0],...o.map(x=>x[0])],a:0,why:`${p[1]} = ${p[0]}`})]}
+function bL(){
+ const a=shuf(LISTEN).slice(0,3).map(l=>mcq({sk:'L',tag:'Nghe',audio:l.text,q:l.q,opts:l.opts,a:l.a,why:l.why,tr:l.text}));
+ const b=shuf(DICT).slice(0,2).map(t=>({kind:'type',sk:'L',tag:'Chép chính tả',audio:t,ans:t}));
+ return [...a,...b]}
+function bR(){const p=rnd(READ);
+ return p.qs.map(x=>mcq({sk:'R',tag:'Đọc: '+p.title,pass:p.text,q:x.q,opts:x.opts,a:x.a,why:x.why,fixed:x.opts===TFN}))}
+function bW(){
+ const g=shuf(GRAM).slice(0,3).map(x=>mcq({sk:'W',tag:'Ngữ pháp',q:x.q,opts:x.opts,a:x.a,why:x.why}));
+ const o=shuf(ORDER).slice(0,2).map(x=>({kind:'order',sk:'W',tag:'Ghép câu',words:x.words,ans:x.a}));
+ return [...g,...o]}
+function bS(){return shuf(SPEAK).slice(0,3).map(x=>({...x,kind:'speak',sk:'S',tag:x.part}))}
+function bB(){return shuf([...bV().slice(0,2),...bL().slice(0,2),...bR().slice(0,1),...bW().slice(0,2),...bS().slice(0,1)])}
+function start(k,isBoss){
+ boss=!!isBoss;mode=k;window.ret=window.ret||({home,learn,games,talk,media,test,dict})[window.cur||'home'];document.body.classList.add('insess');
+ Q=isBoss?bB():{V:bV,L:bL,R:bR,W:bW,S:bS,C:bC}[k]();
+ qi=0;ok=0;combo=0;sx=0;by={};window.again=null;show()}
+function say(t,r){
+ try{const s=speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=r||.85;
+  const v=s.getVoices().find(x=>/^en/i.test(x.lang));if(v)u.voice=v;s.speak(u)}
+ catch(e){toast('Máy không đọc được audio. Hãy xem transcript sau khi trả lời.')}}
+function playBtn(q){
+ if(!('speechSynthesis' in window))return `<div class="passage">Máy chưa hỗ trợ đọc audio. Nội dung: ${esc(q.audio)}</div>`;
+ return `<button class="play" onclick="say(Q[qi].audio)"><span>▶ Nghe</span><small>bấm để nghe lại</small></button>`+(q.sk==='C'?`<details class="wl" style="margin:-4px 0 14px"><summary>Chưa nghe rõ? Xem chữ</summary><p style="margin:8px 0 0">${esc(q.audio)}</p></details>`:'')}
+function show(){
+ locked=false;clearInterval(window.tmr);
+ if(qi>=Q.length)return finish();
+ const q=Q[qi],c=boss?'var(--bad)':SK[q.sk].c;
+ let body='';
+ if(q.kind==='mc')body=(q.pass?`<div class="passage">${esc(q.pass)}</div>`:'')+(q.audio?playBtn(q):'')+
+  `<h2 class="qtext">${esc(q.q)}</h2>${q.fixed?'<p class="sub" style="margin:-8px 0 12px">True, False hay Not Given?</p>':''}<div class="opts">${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${esc(o)}</button>`).join('')}</div><div id="fb"></div>`;
+ if(q.kind==='type')body=playBtn(q)+`<h2 class="qtext">Nghe và gõ lại câu bạn nghe được</h2><input class="inp" id="ti" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Gõ ở đây..." aria-label="Câu bạn nghe được"><div class="row"><button class="btn ghost" onclick="say(Q[qi].audio,.6)">Nghe chậm</button><button class="btn" onclick="chk()">Kiểm tra</button></div><div id="fb"></div>`;
+ if(q.kind==='order'){ord={t:[],p:shuf(q.words.map((w,i)=>i))};
+  body=`<h2 class="qtext">Sắp xếp các từ thành câu đúng</h2><div class="tray" id="tray"></div><div class="pool" id="pool"></div><button class="btn" id="ck" onclick="chkO()" style="margin-top:12px" disabled>Kiểm tra</button><div id="fb"></div>`}
+ if(q.kind==='speak'){sp={left:q.part==='Part 2'?60:q.part==='Part 3'?40:30};
+  body=`<h2 class="qtext">${esc(q.q)}</h2><ul class="list">${q.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul><div class="timer" id="tm">${sp.left}s</div><div id="md"></div><button class="btn" id="go" onclick="goS()">Bắt đầu nói</button><div id="fb"></div>`}
+ $('#app').innerHTML=`<div class="sess" style="--c:${c}"><div class="sesshead"><button class="x" onclick="exitS()" aria-label="Thoát bài">✕</button><div class="prog"><i style="width:${qi/Q.length*100}%"></i></div><div class="combo" id="cb">${combo>1?'×'+combo:''}</div></div><span class="tag">${boss?'BOSS · ':''}${esc(q.tag)} · ${qi+1}/${Q.length}</span>${body}</div>`;
+ toTop();
+ if(q.kind==='order')drawO();
+ if(q.audio&&'speechSynthesis' in window)setTimeout(()=>say(q.audio),350)}
+function drawO(){const q=Q[qi];
+ $('#tray').innerHTML=ord.t.map(i=>`<button class="chip" onclick="mv(${i},0)">${esc(q.words[i])}</button>`).join('');
+ $('#pool').innerHTML=ord.p.map(i=>`<button class="chip" onclick="mv(${i},1)">${esc(q.words[i])}</button>`).join('');
+ $('#ck').disabled=ord.p.length>0}
+function mv(i,fromPool){if(locked)return;
+ if(fromPool){ord.p=ord.p.filter(x=>x!==i);ord.t.push(i)}else{ord.t=ord.t.filter(x=>x!==i);ord.p.push(i)}drawO()}
+function updCombo(){const e=$('#cb');if(e)e.textContent=combo>1?'×'+combo:''}
+function grade(right,msg){
+ const q=Q[qi];locked=true;
+ if(right){combo++;ok++;const g=(10+Math.min(combo-1,5)*2)*(boss?2:1);sx+=g;by[q.sk]=(by[q.sk]||0)+g;sfx.ok();fx('+'+g)}else{combo=0;sfx.bad()}
+ if(q.col&&right)S.col=(S.col||0)+1;
+ if(q.w)S.box[q.w]=right?Math.min(4,(S.box[q.w]||0)+1):0;
+ updCombo();
+ $('#fb').innerHTML=`<div class="feed ${right?'':'bad'} pop"><b>${right?rnd(['Chuẩn!','Đúng rồi!','Ngon!','Quá đỉnh!']):rnd(['Chưa đúng, không sao.','Gần rồi!','Sai một lần là nhớ lâu.'])}</b><p>${msg}</p></div><button class="btn" id="nx" onclick="next()" style="margin-top:12px">Tiếp tục</button>`;
+ $('#nx').focus()}
+function pick(i){
+ if(locked)return;const q=Q[qi];
+ document.querySelectorAll('.opt').forEach((b,k)=>{b.disabled=true;if(k===q.a)b.classList.add('ok');else if(k===i)b.classList.add('bad')});
+ grade(i===q.a,esc(q.why)+(q.tr?`<br>Transcript: ${esc(q.tr)}`:'')+(q.w?`<br>${camLink(q.w)}`:''))}
+function chk(){
+ if(locked)return;const q=Q[qi],v=$('#ti').value;
+ if(!v.trim()){toast('Gõ câu bạn nghe được trước đã nha');return}
+ locked=true;
+ const wa=norm(q.ans).split(' '),wb=norm(v).split(' ');
+ const hit=wa.filter((w,i)=>wb[i]===w).length,right=hit/wa.length>=0.8;
+ locked=false;grade(right,`Đáp án: <b>${esc(q.ans)}</b><br>Bạn gõ: ${esc(v)}<br>Đúng ${hit}/${wa.length} từ.`)}
+function chkO(){
+ if(locked)return;const q=Q[qi];
+ const got=ord.t.map(i=>q.words[i]).join(' ');
+ grade(norm(got)===norm(q.ans),`Câu đúng: <b>${esc(q.ans)}</b>`)}
+function goS(){
+ const b=$('#go');b.textContent='Nói xong rồi';b.onclick=finS;
+ window.tmr=setInterval(()=>{sp.left--;$('#tm').textContent=Math.max(0,sp.left)+'s';if(sp.left<=0)finS()},1000)}
+function finS(){
+ clearInterval(window.tmr);const q=Q[qi];
+ $('#go').style.display='none';
+ $('#md').innerHTML=`<div class="feed"><b>Bài mẫu để so sánh</b><p>${esc(q.model)}</p><p>Cụm nên dùng: ${q.phr.map(esc).join(' · ')}</p></div>`;
+ $('#fb').innerHTML=`<p class="sub" style="margin:14px 0 8px">Bạn thấy mình nói được thế nào?</p><div class="opts"><button class="opt" onclick="rate(2)">Nói trôi chảy, đủ ý</button><button class="opt" onclick="rate(1)">Nói được một phần</button><button class="opt" onclick="rate(0)">Bí, chưa nói được</button></div>`}
+function rate(r){
+ if(locked)return;locked=true;
+ if(r>0){ok++;combo++}else combo=0;
+ const g=[5,10,15][r]*(boss?2:1);sx+=g;by.S=(by.S||0)+g;updCombo();
+ $('#fb').innerHTML=`<div class="feed ${r?'':'bad'} pop"><b>${['Bí cũng là bước học.','Tốt, giữ nhịp!','Tuyệt vời!'][r]}</b><p>Lần sau nói to thành tiếng và thử dùng 1 cụm từ ở trên.</p></div><button class="btn" id="nx" onclick="next()" style="margin-top:12px">Tiếp tục</button>`;
+ $('#nx').focus()}
+function next(){try{speechSynthesis.cancel()}catch(e){}qi++;show()}
+function finish(){
+ const n=Q.length,acc=ok/n,m=boss?2:1;
+ const bonus=(acc===1?30:acc>=.8?20:acc>=.6?10:0)*m;
+ const total=sx+bonus,lv0=Math.floor(S.xp/100)+1;
+ S.xp+=total;
+ if(boss){for(const k in by)S.sk[k]+=by[k]}else{for(const k in by)S.sk[k]+=by[k];S.sk[mode]+=bonus}
+ const t=today(),y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');
+ if(S.last!==t){S.streak=S.last===y?S.streak+1:1;S.last=t}
+ S.sess++;if(acc===1)S.perfect++;
+ const d=day();d.xp+=total;(boss?Object.keys(by):[mode]).forEach(k=>{if(!d.sk.includes(k))d.sk.push(k)});
+ let extra='';
+ if(!d.bonus&&d.sk.includes('V')&&d.sk.some(k=>k!=='V')&&d.xp>=60){d.bonus=true;S.xp+=30;d.xp+=30;extra='Xong cả 3 nhiệm vụ hôm nay: +30 XP!'}
+ const nb=BADGES.filter(b=>!S.badges.includes(b[0])&&b[2]());
+ nb.forEach(b=>S.badges.push(b[0]));
+ const lv1=Math.floor(S.xp/100)+1;save();
+ if(acc>=.6||lv1>lv0){sfx.win();confetti()}
+ const msg=acc===1?'Điểm tuyệt đối!':acc>=.6?'Làm tốt lắm!':'Cứ làm thêm vài bài là lên tay.';
+ $('#app').innerHTML=`<div class="sum"><h2>${msg}</h2><div class="big pop">+${total} XP</div>
+ <div class="stats"><div><b>${ok}/${n}</b><span class="sub">câu đúng</span></div><div><b>${S.streak}</b><span class="sub">ngày liên tiếp</span></div><div><b>Lv ${lv1}</b><span class="sub">${lv1>lv0?'vừa lên cấp':'cấp hiện tại'}</span></div></div>
+ ${extra?`<p><b>${extra}</b></p>`:''}${nb.length?`<p>Huy hiệu mới: <b>${nb.map(b=>b[1]).join(', ')}</b></p>`:''}
+ <div class="row"><button class="btn ghost" onclick="exitS()">Quay lại</button><button class="btn" onclick="${window.again||`start('${mode}',${boss})`}">Làm thêm bài nữa</button></div></div>`;
+ toTop()}
+const cam=w=>'https://dictionary.cambridge.org/dictionary/english-vietnamese/'+encodeURIComponent(w.trim().toLowerCase().replace(/\s+/g,'-'));
+const camLink=(w,t)=>`<a href="${cam(w)}" target="_blank" rel="noopener">${t||'Xem "'+esc(w)+'" trên Cambridge ↗'}</a>`;
+function lookup(e){e.preventDefault();const w=$('#dq').value.trim();
+ $('#dres').innerHTML=w?camLink(w,'Mở "'+esc(w)+'" trên Cambridge Dictionary ↗'):'Gõ một từ trước đã nha.';return false}
+const gHead=p=>`<div class="sesshead"><button class="x" onclick="exitS()" aria-label="Thoát">✕</button><div class="prog"><i style="width:${p}%"></i></div></div>`;
+let st=null;
+function game(g){window.ret=window.ret||({home,learn,games,talk,media,test,dict})[window.cur||'games'];document.body.classList.add('insess');boss=false;mode='V';ok=0;combo=0;sx=0;by={V:0};window.again=`game('${g}')`;({match:gMatch,scr:gScr,fast:gFast})[g]()}
+function gDone(n){clearInterval(window.tmr);Q=new Array(Math.max(1,n)).fill(0);by.V=sx;finish()}
+/* 1. Ghép cặp */
+function gMatch(){st={w:shuf(POOL()).slice(0,6),sel:null,done:[],err:0,fl:[]};st.L=shuf([0,1,2,3,4,5]);st.R=shuf([0,1,2,3,4,5]);drawM()}
+function drawM(){
+ const b=(s,i,t)=>{const dn=st.done.includes(i),sel=st.sel&&st.sel.s===s&&st.sel.i===i,fl=st.fl.includes(s+i);
+  return `<button class="opt ${dn?'ok':''} ${sel?'selb':''} ${fl?'bad':''}" ${dn?'disabled':''} onclick="mt('${s}',${i})">${esc(t)}</button>`};
+ $('#app').innerHTML=`<div class="sess" style="--c:var(--cV)">${gHead(st.done.length/6*100)}<span class="tag">Ghép cặp · chạm một từ rồi chạm nghĩa của nó</span><div class="mgrid"><div>${st.L.map(i=>b('L',i,st.w[i].w)).join('')}</div><div>${st.R.map(i=>b('R',i,st.w[i].vi)).join('')}</div></div><p class="sub" style="margin-top:12px">Số lần ghép sai: ${st.err}</p></div>`}
+function mt(s,i){
+ if(!st.sel||st.sel.s===s){st.sel={s,i};return drawM()}
+ const a=st.sel.s==='L'?st.sel.i:i,c=st.sel.s==='L'?i:st.sel.i;
+ if(a===c){st.done.push(a);st.sel=null;drawM();if(st.done.length===6){const n=6;sx=Math.max(20,72-5*st.err);ok=Math.max(0,n-st.err);gDone(n)}}
+ else{st.err++;st.fl=['L'+a,'R'+c];st.sel=null;drawM();setTimeout(()=>{st.fl=[];if(st)drawM()},500)}}
+/* 2. Đánh vần */
+function gScr(){st={ws:shuf(POOL().filter(v=>!/ /.test(v.w))).slice(0,6),i:0,pts:0};newS()}
+function newS(){const w=st.ws[st.i].w;let L;let k=0;
+ do{L=shuf([...w].map((c,i)=>i));k++}while(k<8&&w.length>2&&L.map(i=>w[i]).join('')===w);
+ st.L=L;st.t=[];st.wrong=0;st.hint=false;st.fin=false;drawS()}
+function drawS(){
+ const v=st.ws[st.i],pool=st.L.filter(k=>!st.t.includes(k));
+ const blank=new RegExp('\\b'+v.w+'\\b','i').test(v.ex)?v.ex.replace(new RegExp('\\b'+v.w+'\\b','i'),'_____'):'Chủ đề: '+v.b;
+ $('#app').innerHTML=`<div class="sess" style="--c:var(--cV)">${gHead(st.i/6*100)}<span class="tag">Đánh vần · ${st.i+1}/6 · ${v.w.length} chữ cái</span><h2 class="qtext">${esc(v.vi)}</h2><p class="sub" style="margin:-6px 0 12px">${esc(blank)}</p><div class="tray">${st.t.map(k=>`<button class="chip" onclick="sBack(${k})">${esc(v.w[k])}</button>`).join('')}</div><div class="pool">${pool.map(k=>`<button class="chip" onclick="sPick(${k})">${esc(v.w[k])}</button>`).join('')}</div><div class="row"><button class="btn ghost" onclick="sHint()">Gợi ý chữ đầu (-6 XP)</button><button class="btn ghost" onclick="st.t=[];drawS()">Xóa</button></div><div id="fb"></div></div>`}
+function sPick(k){if(st.fin)return;st.t.push(k);drawS();if(st.t.length===st.ws[st.i].w.length)chkS()}
+function sBack(k){if(st.fin)return;st.t=st.t.filter(x=>x!==k);drawS()}
+function sHint(){if(st.fin)return;const w=st.ws[st.i].w;st.hint=true;st.t=[st.L.find(k=>w[k]===w[0])];drawS()}
+function chkS(){
+ const v=st.ws[st.i],g=st.t.map(k=>v.w[k]).join('');
+ const info=`<b>${esc(v.w)}</b> = ${esc(v.vi)}${DEF[v.w]?`<br><i>${esc(DEF[v.w])}</i>`:''}<br>${esc(v.ex)}<br>${camLink(v.w)}`;
+ if(g===v.w){st.fin=true;ok++;st.pts+=st.hint?6:12;S.box[v.w]=Math.min(4,(S.box[v.w]||0)+1);
+  $('#fb').innerHTML=`<div class="feed pop"><b>Đúng rồi!</b><p>${info}</p></div><button class="btn" onclick="nextS()" style="margin-top:12px">Tiếp tục</button>`}
+ else{st.wrong++;if(st.wrong>=2){st.fin=true;S.box[v.w]=0;
+  $('#fb').innerHTML=`<div class="feed bad"><b>Đáp án là:</b><p>${info}</p></div><button class="btn" onclick="nextS()" style="margin-top:12px">Tiếp tục</button>`}
+  else{toast('Chưa đúng, thử lại nha');st.t=[];drawS()}}}
+function nextS(){st.i++;if(st.i>=6){sx=st.pts;gDone(6)}else newS()}
+/* 3. Tốc độ 60 giây */
+function gFast(){st={left:60,right:0,tot:0,last:''};cardF();
+ window.tmr=setInterval(()=>{st.left--;const e=$('#tm');if(e)e.textContent=st.left+'s';if(st.left<=0){sx=Math.min(120,st.right*4);ok=st.right;gDone(st.tot)}},1000)}
+function cardF(){
+ const P=POOL(),v=rnd(P),good=Math.random()<.5,vi=good?v.vi:rnd(P.filter(x=>x.w!==v.w)).vi;
+ st.c={v,good};
+ $('#app').innerHTML=`<div class="sess" style="--c:var(--cV)">${gHead(st.left/60*100)}<span class="tag">Tốc độ · đúng ${st.right}/${st.tot}</span><div class="timer" id="tm">${st.left}s</div><h2 class="qtext" style="text-align:center;font-size:2rem">${esc(v.w)}</h2><p style="text-align:center;font-size:1.3rem;margin:0 0 16px">= ${esc(vi)}</p><div class="row"><button class="btn no" onclick="ansF(false)">Sai</button><button class="btn yes" onclick="ansF(true)">Đúng</button></div><p class="sub" style="margin-top:14px">${st.last}</p></div>`}
+function ansF(s){
+ const c=st.c,r=s===c.good;st.tot++;if(r)st.right++;
+ S.box[c.v.w]=r?Math.min(4,(S.box[c.v.w]||0)+1):0;
+ st.last=(r?'Đúng: ':'Sai: ')+c.v.w+' = '+c.v.vi;cardF()}
+function phrases(){
+ $('#app').innerHTML=`<div class="sess" style="--c:var(--cC)"><div class="sesshead"><button class="x" onclick="home()" aria-label="Về trang chủ">✕</button><h2>Cụm câu giao tiếp</h2></div><p class="sub">Chạm vào câu để nghe máy đọc. Đọc theo thành tiếng 2–3 lần, đừng đọc thầm.</p>${PHRASES.map((g,gi)=>`<div class="phgrp"><h3>${esc(g[0])}</h3><p class="sub" style="margin:2px 0 0">${esc(g[1])}</p>${g[2].map((p,pi)=>`<button class="ph" onclick="say(PHRASES[${gi}][2][${pi}][0],.8)"><div><b>${esc(p[0])}</b><span class="vi">${esc(p[1])}</span></div><span class="sp">▶</span></button>`).join('')}</div>`).join('')}</div>`;window.scrollTo(0,0)}
+
+// ---- Gộp từ trong sách vào kho từ ----
+VOCAB.forEach(v=>{v.lv=v.lv||1;v.src=v.src||'Từ app soạn'});
+TOPICS.forEach(t=>t[4].split('|').forEach(it=>{const [w,vi]=it.split('=');const old=VOCAB.find(v=>v.w===w);
+ if(old){old.t=old.t||t[0];return}VOCAB.push({w,vi,b:t[1],t:t[0],lv:t[2],src:t[3],ex:''})}));
+const TW=id=>VOCAB.filter(v=>v.t===id);
+function POOL(){const p=VOCAB.filter(v=>v.lv===(S.lv||1));return p.length>=12?p:VOCAB}
+function toTop(){const m=document.getElementById('main');if(m)m.scrollTop=0;window.scrollTo(0,0)}
+function exitS(){clearInterval(window.tmr);try{speechSynthesis.cancel()}catch(e){}const r=window.ret;window.ret=null;if(r)r();else home()}
+// ---- Khung ứng dụng ----
+const TABS=[["home","⌂","Trang chủ"],["learn","Aa","Học theo chủ đề"],["games","★","Trò chơi"],["talk","☺","Giao tiếp"],["media","▶","Phim & nhạc"],["test","✓","Thi thử"],["dict","?","Từ điển"]];
+const MOB=["home","learn","games","media","test"];
+function shell(){
+ $('#side').innerHTML=`<div class="brand"><i>IE</i>Leo band IELTS</div>${TABS.map(t=>`<button class="nav" id="nv-${t[0]}" onclick="go('${t[0]}')"><b>${t[1]}</b>${t[2]}</button>`).join('')}<div class="sidefoot">Tiến độ lưu trên trình duyệt này.</div>`;
+ $('#tabbar').innerHTML=MOB.map(k=>{const t=TABS.find(x=>x[0]===k);return `<button id="tb-${k}" onclick="go('${k}')"><b>${t[1]}</b>${t[2].replace('Học theo chủ đề','Chủ đề')}</button>`}).join('');}
+function mark(k){document.body.classList.remove('insess');document.querySelectorAll('.nav,.tabbar button').forEach(b=>b.classList.toggle('on',b.id==='nv-'+k||b.id==='tb-'+k));window.ret=null;window.cur=k}
+function go(k){clearInterval(window.tmr);({home,learn,games,talk,media,test,dict})[k]();try{location.hash=k==='home'?'':k}catch(e){}}
+const ph=(h,p)=>`<div class="pagehead"><h1>${h}</h1>${p?`<p>${p}</p>`:''}</div>`;
+// ---- Học theo chủ đề ----
+function lvSeg(){return `<div class="seg" role="tablist"><button class="${(S.lv||1)===1?'on':''}" onclick="S.lv=1;save();learn()">Cấp 1 · 4.5 → 5.0</button><button class="${S.lv===2?'on':''}" onclick="S.lv=2;save();learn()">Cấp 2 · 5.0 → 5.5</button></div>`}
+function mastered(ws){return ws.filter(v=>(S.box[v.w]||0)>=2).length}
+function learn(){mark('learn');const L=S.lv||1;
+ const ts=TOPICS.filter(t=>t[2]===L);
+ $('#app').innerHTML=ph('Học theo chủ đề','Từ vựng chọn từ English Vocabulary in Use (Pre-intermediate & Intermediate), Destination B1 và English Collocations in Use. Mỗi từ có nghĩa Việt và định nghĩa tiếng Anh.')+lvSeg()+
+ `<div class="tlist">${ts.map(t=>{const ws=TW(t[0]),m=mastered(ws);return `<button class="tcard" onclick="topic('${t[0]}')"><h3>${t[1]}</h3><span class="src">${esc(t[3])}</span><span class="sub">${ws.length} từ · đã nhớ ${m}</span><span class="meter"><i style="width:${m/ws.length*100}%"></i></span></button>`}).join('')}
+ <button class="tcard" onclick="collo()"><h3>Kết hợp từ (Collocations)</h3><span class="src">English Collocations in Use · Intermediate</span><span class="sub">${COLLO.length} cụm như make a decision, heavy traffic</span><span class="meter"><i style="width:${Math.min(100,(S.col||0)/COLLO.length*100)}%"></i></span></button></div>`;toTop()}
+function topic(id){mark('learn');const t=TOPICS.find(x=>x[0]===id),ws=TW(id);window.lastT=id;
+ $('#app').innerHTML=`<div class="pagehead"><button class="btn ghost" style="width:auto;padding:8px 14px" onclick="learn()">← Chủ đề</button><h1 style="margin-top:12px">${t[1]}</h1><p>${esc(t[3])} · ${ws.length} từ · Cấp ${t[2]}</p></div>
+ <div class="row"><button class="btn" onclick="flash('${id}')">Lật thẻ ghi nhớ</button><button class="btn ghost" onclick="tquiz('${id}')">Làm quiz chủ đề</button></div>
+ <div class="stack" style="margin-top:16px">${ws.map(v=>`<div class="wcard"><button class="spk" aria-label="Nghe ${esc(v.w)}" onclick="say('${esc(v.w).replace(/'/g,"\\'")}',.8)">▶</button><div class="wt"><b><span class="dot ${(S.box[v.w]||0)>=2?'m':''}"></span>${esc(v.w)}</b> · ${esc(v.vi)}${DEF[v.w]?`<i>${esc(DEF[v.w])}</i>`:''}<span class="src">${camLink(v.w,'Cambridge ↗')}</span></div></div>`).join('')}</div>`;toTop()}
+let fl=null;
+function flash(id){document.body.classList.add('insess');window.ret=()=>topic(id);fl={ws:shuf(TW(id)),i:0,k:0};drawF()}
+function drawF(){const v=fl.ws[fl.i];if(!v){sfx.win();confetti();save();
+ $('#app').innerHTML=`<div class="sum"><h2>Xong ${fl.ws.length} thẻ!</h2><div class="big pop">${fl.k} nhớ</div><div class="row"><button class="btn ghost" onclick="exitS()">Về chủ đề</button><button class="btn" onclick="tquiz(window.lastT)">Làm quiz luôn</button></div></div>`;return}
+ $('#app').innerHTML=`<div class="sess" style="--c:var(--cV)">${gHead(fl.i/fl.ws.length*100)}<span class="tag">Thẻ ${fl.i+1}/${fl.ws.length} · chạm để lật</span>
+ <div class="flip" id="fp" onclick="this.classList.toggle('on')"><div class="in"><div class="fc front"><b>${esc(v.w)}</b><span>Bạn nhớ nghĩa không?</span></div><div class="fc back"><b>${esc(v.vi)}</b>${DEF[v.w]?`<i>${esc(DEF[v.w])}</i>`:''}${v.ex?`<span class="sub">${esc(v.ex)}</span>`:''}</div></div></div>
+ <div class="row"><button class="btn no" onclick="fA(0)">Chưa nhớ</button><button class="btn yes" onclick="fA(1)">Nhớ rồi</button></div><p class="sub" style="text-align:center;margin-top:10px">${camLink(v.w)}</p></div>`;
+ setTimeout(()=>say(v.w,.8),200)}
+function fA(r){const v=fl.ws[fl.i];S.box[v.w]=r?Math.min(4,(S.box[v.w]||0)+1):0;if(r){fl.k++;S.xp+=2;sfx.ok()}else sfx.bad();fl.i++;save();drawF()}
+function tquiz(id){const ws=TW(id),all=POOL();boss=false;mode='V';window.ret=()=>topic(id);
+ Q=shuf(ws).slice(0,6).map((v,i)=>{const o=shuf(VOCAB.filter(x=>x.w!==v.w&&x.t===id).concat(shuf(all).slice(0,6)).filter(x=>x.w!==v.w)).slice(0,3);
+  const df=DEF[v.w],why=`${v.w} = ${v.vi}`+(df?`. Định nghĩa: ${df}`:'');
+  if(i%3===1&&df&&!new RegExp('\\b'+v.w+'\\b','i').test(df))return mcq({sk:'V',w:v.w,tag:'Định nghĩa tiếng Anh',q:`Từ nào có nghĩa: "${df}"?`,opts:[v.w,...o.map(x=>x.w)],a:0,why});
+  if(i%3===2)return mcq({sk:'V',w:v.w,tag:'Từ vựng',q:`Từ tiếng Anh nào nghĩa là "${v.vi}"?`,opts:[v.w,...o.map(x=>x.w)],a:0,why});
+  return mcq({sk:'V',w:v.w,tag:'Từ vựng',q:`"${v.w}" nghĩa là gì?`,opts:[v.vi,...o.map(x=>x.vi)],a:0,why})});
+ qi=0;ok=0;combo=0;sx=0;by={};window.again=`tquiz('${id}')`;document.body.classList.add('insess');show()}
+const CV=["make","do","take","have","pay","save","waste","spend","catch","keep","lose","get","go","give","meet","sit","attend","carry","play","break","hit","set","launch","apply","earn","hand","move","protect","tackle","eradicate"];
+function collo(){boss=false;mode='V';window.ret=learn;
+ Q=shuf(COLLO).slice(0,6).map(c=>{const p=c[0].split(' ');let q,opts;
+  if(CV.includes(p[0])){q=`_____ ${p.slice(1).join(' ')} (${c[1]})`;opts=[p[0],...shuf(CV.filter(x=>x!==p[0]&&!COLLO.some(k=>k[0]===x+' '+p.slice(1).join(' ')))).slice(0,3)]}
+  else{const last=p.pop();q=`${p.join(' ')} _____ (${c[1]})`;opts=[last,...shuf([...new Set(COLLO.map(k=>k[0].split(' ').pop()))].filter(x=>x!==last)).slice(0,3)]}
+  return mcq({sk:'V',tag:'Collocation · '+c[2],q,opts,a:0,why:`${c[0]} = ${c[1]}`,col:1})});
+ qi=0;ok=0;combo=0;sx=0;by={};window.again='collo()';document.body.classList.add('insess');show()}
+// ---- Trò chơi ----
+function games(){mark('games');
+ $('#app').innerHTML=ph('Trò chơi từ vựng',`Dùng từ của Cấp ${S.lv||1}. Đổi cấp ở tab Học theo chủ đề.`)+`<div class="grid">
+ <button class="card" style="--c:var(--cV)" onclick="game('match')"><span class="ico">⇄</span><h3>Ghép cặp</h3><span class="sub">Nối 6 từ với nghĩa tiếng Việt</span></button>
+ <button class="card" style="--c:var(--cV)" onclick="game('scr')"><span class="ico">Az</span><h3>Đánh vần</h3><span class="sub">Xếp chữ cái thành từ đúng</span></button>
+ <button class="card" style="--c:var(--cV)" onclick="game('fast')"><span class="ico">60</span><h3>Tốc độ 60 giây</h3><span class="sub">Đúng hay sai, càng nhanh càng nhiều XP</span></button>
+ <button class="card" style="--c:var(--cW)" onclick="collo()"><span class="ico">+</span><h3>Điền collocation</h3><span class="sub">make, do, take hay have?</span></button>
+ <button class="card" style="--c:var(--bad);grid-column:1/-1;min-height:0" onclick="start('B',true)"><span class="ico">!</span><h3>Đấu Boss</h3><span class="sub">8 câu trộn đủ kỹ năng, XP nhân đôi</span></button></div>`;toTop()}
+// ---- Giao tiếp ----
+function talk(){mark('talk');
+ $('#app').innerHTML=ph('Giao tiếp hằng ngày','Hội thoại đời thường cũng là chất liệu cho Listening Section 1 và Speaking Part 1.')+`<div class="grid">
+ <button class="card" style="--c:var(--cC);grid-column:1/-1;min-height:0" onclick="start('C')"><span class="ico">☺</span><h3>Luyện hội thoại</h3><span class="sub">Nghe người kia nói, chọn câu đáp. ${DIALOGS.length} tình huống.</span></button></div>
+ ${PHRASES.map((g,gi)=>`<div class="phgrp"><h3>${esc(g[0])}</h3><p class="sub" style="margin:2px 0 0">${esc(g[1])}</p>${g[2].map((p,pi)=>`<button class="ph" onclick="say(PHRASES[${gi}][2][${pi}][0],.8)"><div><b>${esc(p[0])}</b><span class="vi">${esc(p[1])}</span></div><span class="sp">▶</span></button>`).join('')}</div>`).join('')}`;toTop()}
+// ---- Từ điển ----
+function dict(){mark('dict');
+ $('#app').innerHTML=ph('Từ điển',`Tra nhanh trên Cambridge Dictionary, hoặc xem ${VOCAB.length} từ có trong app.`)+`<form class="dform" onsubmit="return lookup(event)"><input class="inp" id="dq" placeholder="Gõ một từ tiếng Anh..." aria-label="Từ cần tra" autocomplete="off" autocapitalize="off"><button class="btn" style="width:auto" type="submit">Tra</button></form><p id="dres" class="sub" style="margin:8px 0 0"></p>
+ <input class="inp" id="flt" style="margin-top:16px" placeholder="Lọc danh sách từ trong app..." aria-label="Lọc từ" oninput="dlist()"><div class="stack" id="dl" style="margin-top:12px"></div>`;dlist();toTop()}
+function dlist(){const f=($('#flt').value||'').toLowerCase().trim();
+ const ws=VOCAB.filter(v=>!f||v.w.includes(f)||v.vi.toLowerCase().includes(f)).slice(0,80);
+ $('#dl').innerHTML=ws.map(v=>`<div class="wcard"><div class="wt"><b>${esc(v.w)}</b> · ${esc(v.vi)}${DEF[v.w]?`<i>${esc(DEF[v.w])}</i>`:''}<span class="src">${esc(v.src)} · ${camLink(v.w,'Cambridge ↗')}</span></div></div>`).join('')+(ws.length===80?'<p class="sub">Gõ để lọc thêm…</p>':'')}
+// ---- Phim & nhạc ----
+function claim(key,xp){const d=day();d.claim=d.claim||[];if(d.claim.includes(key)){toast('Hôm nay bạn đã nhận XP cho mục này rồi');return}
+ d.claim.push(key);S.xp+=xp;d.xp+=xp;if(!d.sk.includes('L'))d.sk.push('L');S.sk.L+=xp;save();sfx.win();confetti();toast(`+${xp} XP. Giỏi lắm!`)}
+function media(){mark('media');
+ $('#app').innerHTML=ph('Phim & nhạc','Luyện nghe bằng thứ bạn thích. Bấm mở video trên YouTube, làm xong nhiệm vụ thì quay lại nhận XP. Mẹo: bật phụ đề tiếng Anh và chỉnh tốc độ 0.75×.')+
+ `<h2 class="sec">Hoạt hình, phim & podcast</h2><div class="stack">${MEDIA.map((m,i)=>`<div class="media"><div class="mh"><span class="thumb" style="background:${m[6]}">▶</span><div><b>${esc(m[0])}</b><br><span class="pill">${esc(m[1])}</span> <span class="pill">${esc(m[2])}</span></div></div><span class="sub">${esc(m[3])}</span>
+ ${m[5].map((t,j)=>`<label class="task"><input type="checkbox" onchange="mchk(${i})" id="mt${i}_${j}">${esc(t)}</label>`).join('')}
+ <div class="row" style="margin-top:4px"><a class="btn ghost" style="text-align:center;text-decoration:none" href="${m[4]}" target="_blank" rel="noopener">Mở trên YouTube ↗</a><button class="btn" id="mc${i}" disabled onclick="claim('m${i}',25)">Nhận 25 XP</button></div></div>`).join('')}</div>
+ <h2 class="sec">Học qua bài hát</h2><p class="sub">Lời bài hát có bản quyền nên app không chép lời. Bấm để mở bản có lời (lyrics video) trên YouTube.</p>
+ <div class="media"><b>Nhiệm vụ mỗi bài hát</b>${SONG_TASKS.map(t=>`<span class="task">• ${esc(t)}</span>`).join('')}</div>
+ <div class="tlist" style="margin-top:12px">${SONGS.map((s,i)=>`<div class="tcard"><h3>${esc(s[0])}</h3><span class="src">${esc(s[1])}</span><span class="sub">${esc(s[2])}</span><div class="row" style="margin-top:6px"><a class="btn ghost" style="text-align:center;text-decoration:none;padding:10px" href="${YT(s[0]+' '+s[1]+' lyrics')}" target="_blank" rel="noopener">Nghe ↗</a><button class="btn" style="padding:10px" onclick="claim('s${i}',15)">Xong +15</button></div></div>`).join('')}</div>`;toTop()}
+function mchk(i){const all=[...document.querySelectorAll(`[id^="mt${i}_"]`)].every(c=>c.checked);$('#mc'+i).disabled=!all}
+// ---- Thi thử ----
+let MT=null;
+function test(){mark('test');
+ $('#app').innerHTML=ph('Thi thử','Đề mini theo format IELTS do app soạn, có đáp án và band ước tính ngay sau khi nộp. Có thêm phiếu chấm cho đề trong sách Cambridge của bạn.')+`<div class="grid">
+ <button class="card" style="--c:var(--cL)" onclick="mtL()"><span class="ico">♪</span><h3>Listening</h3><span class="sub">2 phần · 10 câu · ~8 phút</span></button>
+ <button class="card" style="--c:var(--cR)" onclick="mtR()"><span class="ico">≡</span><h3>Reading</h3><span class="sub">1 bài đọc · 8 câu · 15 phút</span></button>
+ <button class="card" style="--c:var(--cW)" onclick="mtW(1)"><span class="ico">✎</span><h3>Writing Task 1</h3><span class="sub">Biểu đồ cột · 20 phút</span></button>
+ <button class="card" style="--c:var(--cW)" onclick="mtW(2)"><span class="ico">✎</span><h3>Writing Task 2</h3><span class="sub">Nghị luận · 40 phút</span></button>
+ <button class="card" style="--c:var(--cS)" onclick="start('S')"><span class="ico">◉</span><h3>Speaking</h3><span class="sub">Part 1–3 có bấm giờ</span></button>
+ <button class="card" style="--c:var(--sun)" onclick="bookKey()"><span class="ico">C</span><h3>Chấm đề sách Cambridge</h3><span class="sub">Nhập đáp án từ sách của bạn, chấm 40 câu</span></button></div>`;toTop()}
+const nrm=s=>String(s).toLowerCase().replace(/[£$.,]/g,'').replace(/\s+/g,' ').trim();
+function mhead(t){document.body.classList.add('insess');window.ret=test;return `<div class="sess">${gHead(0)}<span class="tag" style="--c:var(--sun)">${t}</span>`}
+function mtL(){const L=MOCK.listen;let n=0;
+ $('#app').innerHTML=mhead('Thi thử · Listening')+`<p class="sub">Trong phòng thi bạn chỉ nghe 1 lần. Ở đây được nghe lại, nhưng hãy thử nghe 1 lần trước.</p>`+L.map((p,pi)=>`<h2 class="sec">${p.part}</h2><button class="play" onclick="say(MOCK.listen[${pi}].audio,.9)"><span>▶ Nghe phần ${pi+1}</span><small>bấm lần nữa để nghe lại</small></button>`+
+  p.qs.map(q=>{n++;return q.length===2?`<label class="task" style="flex-direction:column;gap:4px;margin-bottom:10px">${n}. ${esc(q[0])}<input class="inp" id="lq${n}" autocomplete="off" autocapitalize="off"></label>`:
+   `<div style="margin-bottom:12px"><b>${n}. ${esc(q[0])}</b>${q[1].map((o,oi)=>`<label class="task"><input type="radio" name="lq${n}" value="${oi}">${String.fromCharCode(65+oi)}. ${esc(o)}</label>`).join('')}</div>`}).join('')).join('')+
+  `<button class="btn" onclick="gradeL()" style="margin-top:12px">Nộp bài & xem đáp án</button><div id="res"></div></div>`;toTop()}
+function gradeL(){let n=0,c=0,rows='';MOCK.listen.forEach(p=>p.qs.forEach(q=>{n++;let ok,got,ans;
+ if(q.length===2){const e=$('#lq'+n);got=e.value;ok=q[1].includes(nrm(got));ans=q[1][0];e.classList.add(ok?'r':'w')}
+ else{const s=document.querySelector(`[name=lq${n}]:checked`);got=s?q[1][+s.value]:'(bỏ trống)';ok=s&&+s.value===q[2];ans=q[1][q[2]]}
+ if(ok)c++;rows+=`<tr><td>${n}</td><td>${ok?'✓':'✗'}</td><td>${esc(got||'(bỏ trống)')}</td><td><b>${esc(ans)}</b></td></tr>`}));
+ mres(c,n,BAND_L,rows,MOCK.listen.map((p,i)=>`<details class="wl"><summary>Transcript phần ${i+1}</summary><p>${esc(p.audio)}</p></details>`).join(''),'L')}
+function mres(c,n,tb,rows,extra,k){const sc=Math.round(c/n*40),b=toBand(sc,tb);
+ if(!MT||MT!==k){S.xp+=c*5;const d=day();d.xp+=c*5;if(!d.sk.includes(k))d.sk.push(k);S.sk[k]+=c*5;save();MT=k}
+ if(c/n>=.6){sfx.win();confetti()}
+ $('#res').innerHTML=`<div class="sum" style="padding:20px 0 6px"><p class="sub">Đúng ${c}/${n} câu · quy ra khoảng ${sc}/40</p><div class="band pop">Band ~${b}</div><p class="sub">Ước tính từ đề mini, chỉ để tham khảo. +${c*5} XP</p></div>
+ <table class="res"><tr><th>Câu</th><th></th><th>Bạn trả lời</th><th>Đáp án</th></tr>${rows}</table>${extra}<div class="row"><button class="btn ghost" onclick="exitS()">Về tab Thi thử</button></div>`;
+ $('#res').scrollIntoView({behavior:'smooth'})}
+function mtR(){const R=MOCK.read;MT=null;
+ $('#app').innerHTML=mhead('Thi thử · Reading')+`<div class="timer" id="tm" style="font-size:2rem">15:00</div><h2 class="qtext">${R.title}</h2><div class="passage" style="max-height:none">${R.text.map(p=>`<p>${esc(p)}</p>`).join('')}</div>`+
+ R.qs.map((q,i)=>`<div style="margin-bottom:12px"><b>${i+1}. ${esc(q.q)}</b>${q.t==='gap'?`<input class="inp" id="rq${i}" autocomplete="off" autocapitalize="off" style="margin-top:6px">`:(q.t==='tfng'?TFN:q.o).map((o,oi)=>`<label class="task"><input type="radio" name="rq${i}" value="${oi}">${esc(o)}</label>`).join('')}</div>`).join('')+
+ `<button class="btn" onclick="gradeR()">Nộp bài & xem đáp án</button><div id="res"></div></div>`;
+ let left=900;window.tmr=setInterval(()=>{left--;const e=$('#tm');if(e)e.textContent=`${String(Math.floor(left/60)).padStart(2,'0')}:${String(left%60).padStart(2,'0')}`;if(left<=0){clearInterval(window.tmr);toast('Hết giờ! Nộp bài nhé.')}},1000);toTop()}
+function gradeR(){clearInterval(window.tmr);let c=0,rows='';MOCK.read.qs.forEach((q,i)=>{let ok,got,ans;
+ if(q.t==='gap'){const e=$('#rq'+i);got=e.value;ok=q.a.includes(nrm(got));ans=q.a[0];e.classList.add(ok?'r':'w')}
+ else{const o=q.t==='tfng'?TFN:q.o,s=document.querySelector(`[name=rq${i}]:checked`);got=s?o[+s.value]:'';ok=s&&+s.value===q.a;ans=o[q.a]}
+ if(ok)c++;rows+=`<tr><td>${i+1}</td><td>${ok?'✓':'✗'}</td><td>${esc(got||'(bỏ trống)')}</td><td><b>${esc(ans)}</b></td></tr>`});MT=null;
+ mres(c,MOCK.read.qs.length,BAND_R,rows,'<p class="sub" style="margin-top:10px">Mẹo: Not Given là khi bài đọc không hề nhắc tới thông tin đó. False là khi bài đọc nói ngược lại.</p>','R')}
+function mtW(k){const W=k===1?MOCK.w1:MOCK.w2,min=k===1?150:250;
+ let chart='';if(k===1){const mx=50;chart=`<svg viewBox="0 0 320 180" style="width:100%;max-width:520px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:8px 0" role="img" aria-label="Biểu đồ cột phương tiện đi làm 2005 và 2025">${[0,10,20,30,40,50].map(v=>`<line x1="34" x2="312" y1="${150-v*2.6}" y2="${150-v*2.6}" stroke="#F2C6C9" stroke-width=".6"/><text x="28" y="${153-v*2.6}" font-size="8" text-anchor="end" fill="#7A5A5F">${v}%</text>`).join('')}${W.data.map((r,i)=>{const x=48+i*68;return `<rect x="${x}" y="${150-r[1]*2.6}" width="22" height="${r[1]*2.6}" fill="#F2A0AC"/><rect x="${x+24}" y="${150-r[2]*2.6}" width="22" height="${r[2]*2.6}" fill="#E4002B"/><text x="${x+11}" y="${146-r[1]*2.6}" font-size="8" text-anchor="middle" fill="#2A1216">${r[1]}</text><text x="${x+35}" y="${146-r[2]*2.6}" font-size="8" text-anchor="middle" fill="#2A1216">${r[2]}</text><text x="${x+23}" y="164" font-size="9" text-anchor="middle" fill="#2A1216">${r[0]}</text>`}).join('')}<rect x="200" y="170" width="8" height="8" fill="#F2A0AC"/><text x="211" y="177" font-size="8" fill="#2A1216">2005</text><rect x="245" y="170" width="8" height="8" fill="#E4002B"/><text x="256" y="177" font-size="8" fill="#2A1216">2025</text></svg>`}
+ $('#app').innerHTML=mhead('Thi thử · Writing Task '+k)+`<p class="qtext" style="font-size:1.1rem">${esc(W.q)}</p>${chart}<ul class="list">${W.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+ <textarea class="inp" id="wt" style="margin-top:12px" placeholder="Viết bài của bạn ở đây..." aria-label="Bài viết" oninput="$('#wc').textContent=(this.value.trim().match(/\\S+/g)||[]).length"></textarea><p class="sub">Số từ: <b id="wc">0</b> / tối thiểu ${min}</p>
+ <button class="btn" onclick="wDone(${k})">Nộp bài & xem bài mẫu</button><div id="res"></div></div>`;toTop()}
+function wDone(k){const W=k===1?MOCK.w1:MOCK.w2,t=$('#wt').value,n=(t.trim().match(/\S+/g)||[]).length,min=k===1?150:250;
+ const has=w=>new RegExp('\\b'+w+'\\b','i').test(t);
+ const ck=[[n>=min,`Đủ ${min} từ (bạn viết ${n})`],[k===1?has('overall'):has('in conclusion')||has('to conclude'),k===1?'Có câu Overall':'Có kết bài (In conclusion…)'],[['however','in addition','moreover','firstly','by contrast','similarly','while','whereas'].some(has),'Có từ nối'],[t.split(/\n\s*\n/).length>=3,'Chia từ 3 đoạn trở lên']];
+ if(n>=40){S.xp+=30;day().xp+=30;S.sk.W+=30;save();sfx.win()}
+ $('#res').innerHTML=`<h2 class="sec">Tự kiểm tra</h2>${ck.map(c=>`<p class="task">${c[0]?'✅':'⬜'} ${c[1]}</p>`).join('')}<h2 class="sec">${k===1?'Bài mẫu (band ~6)':'Dàn ý gợi ý'}</h2><div class="passage" style="max-height:none;white-space:pre-line">${esc(k===1?W.model:W.outline)}</div>
+ <p class="sub">App chưa chấm điểm bài viết tự động. Muốn chấm chi tiết, bạn copy bài và gửi Claude kèm câu: "Chấm bài IELTS Writing theo 4 tiêu chí".</p><button class="btn ghost" onclick="exitS()">Về tab Thi thử</button>`;$('#res').scrollIntoView({behavior:'smooth'})}
+// ---- Phiếu chấm đề sách ----
+function bk(){try{return JSON.parse(localStorage.getItem('ieltsq_keys')||'{}')}catch(e){return{}}}
+function bookKey(){document.body.classList.add('insess');window.ret=test;const K=bk();
+ $('#app').innerHTML=`<div class="sess">${gHead(0)}<span class="tag" style="--c:var(--sun)">Chấm đề sách Cambridge</span><h2 class="qtext">Phiếu trả lời 40 câu</h2>
+ <p class="sub">Cách dùng với Cambridge IELTS 21 (hoặc cuốn bất kỳ) của bạn: 1) Làm bài trong sách. 2) Lần đầu, chép đáp án ở cuối sách vào ô Đáp án, mỗi dòng 1 câu. Nhiều đáp án đúng thì ngăn bằng dấu /, ví dụ: <b>10 / ten</b>. 3) Nhập câu trả lời của bạn vào 40 ô, bấm Chấm. Đáp án được lưu riêng trên máy bạn.</p>
+ <div class="row"><select class="inp" id="bt" onchange="bkLoad()">${['Test 1','Test 2','Test 3','Test 4'].map(t=>`<option>${t}</option>`).join('')}</select><select class="inp" id="bs" onchange="bkLoad()"><option>Listening</option><option>Reading</option></select></div>
+ <details class="wl" id="kd"><summary>Đáp án (chép từ sách)</summary><textarea class="inp" id="bkey" style="margin-top:8px" placeholder="1 dòng = 1 câu, đủ 40 dòng"></textarea><button class="btn ghost" style="margin-top:8px" onclick="bkSave()">Lưu đáp án</button></details>
+ <div class="ans" style="margin-top:14px">${Array.from({length:40},(_,i)=>`<label>${i+1}<input id="ba${i}" autocomplete="off" autocapitalize="off"></label>`).join('')}</div>
+ <button class="btn" style="margin-top:14px" onclick="bkGrade()">Chấm</button><div id="res"></div></div>`;bkLoad();toTop()}
+const bkId=()=>$('#bt').value+'|'+$('#bs').value;
+function bkLoad(){const k=bk()[bkId()]||'';$('#bkey').value=k;$('#kd').open=!k;for(let i=0;i<40;i++){const e=$('#ba'+i);e.value='';e.className=''}$('#res').innerHTML=''}
+function bkSave(){const K=bk();K[bkId()]=$('#bkey').value;try{localStorage.setItem('ieltsq_keys',JSON.stringify(K))}catch(e){}toast('Đã lưu đáp án cho '+bkId().replace('|',' · '));$('#kd').open=false}
+function bkGrade(){const lines=$('#bkey').value.split('\n').map(s=>s.replace(/^\s*\d+[.)]?\s*/,'').trim()).filter(Boolean);
+ if(lines.length<40){toast(`Đáp án mới có ${lines.length}/40 dòng. Mở mục Đáp án để chép đủ.`);$('#kd').open=true;return}
+ let c=0,wrong=[];for(let i=0;i<40;i++){const e=$('#ba'+i),acc=lines[i].split('/').map(nrm),ok=acc.includes(nrm(e.value))&&e.value.trim()!=='';e.className=ok?'r':'w';if(ok)c++;else wrong.push(`${i+1}: ${lines[i]}`)}
+ const L=$('#bs').value==='Listening',b=toBand(c,L?BAND_L:BAND_R);if(c>=24){sfx.win();confetti()}
+ $('#res').innerHTML=`<div class="sum" style="padding:18px 0 6px"><p class="sub">Đúng ${c}/40</p><div class="band pop">Band ~${b}</div><p class="sub">Theo bảng quy đổi ${L?'Listening':'Academic Reading'} phổ biến, chỉ mang tính ước tính.</p></div>${wrong.length?`<details class="wl" open><summary>${wrong.length} câu sai · đáp án đúng</summary><p>${wrong.map(esc).join('<br>')}</p></details>`:''}`}
+// ---- Khởi động ----
+shell();initSnd();
+(function(){const h=(location.hash||'').slice(1);if(TABS.some(t=>t[0]===h)&&h!=='home')go(h);else home()})();
+</script></body></html>
