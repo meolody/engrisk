@@ -268,21 +268,25 @@ body{background:#fff}
 .card:hover,.tcard:hover{transform:none;box-shadow:none;border-color:var(--sun)}
 .sum .big{text-shadow:none}
 .nav.on{border:1px solid var(--line)}
-/* Lộ trình */
-.road{border-top:1px solid #ECE7E7;margin-top:12px}
-.stage{display:grid;grid-template-columns:110px 1fr;gap:24px;padding:26px 0;border-bottom:1px solid #ECE7E7}
-.stage .bd{font-family:var(--display);font-weight:800;font-size:1.7rem;line-height:1.1;color:var(--muted)}
-.stage .bd small{display:block;font-family:var(--body);font-size:.78rem;font-weight:600;margin-top:6px}
-.stage.now .bd{color:var(--sun)}
-.stage h3{font-size:1.2rem;margin-bottom:6px}
-.stage dl{display:grid;grid-template-columns:90px 1fr;gap:6px 14px;margin:12px 0;font-size:.94rem}
-.stage dt{color:var(--muted);font-weight:600}
-.stage dd{margin:0}
-.stage .lnk{background:none;border:0;padding:0;color:var(--sun);font-weight:700}
-@media (max-width:600px){.stage{grid-template-columns:1fr;gap:6px}.stage dl{grid-template-columns:1fr}.stage dt{margin-top:6px}}
-.seg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.seg::-webkit-scrollbar{display:none}.seg button{white-space:nowrap}
-
-.stage .bd{font-size:1.5rem}
+/* Lộ trình theo kiểu thẻ giống các trang khác */
+.road{display:flex;flex-direction:column;gap:16px;margin-top:16px}
+.stage{background:#fff;border:1px solid var(--line);border-left:6px solid var(--line);border-radius:4px;padding:18px 20px}
+.stage.now{border-color:var(--sun);border-left-color:var(--sun)}
+.stage.done{border-left-color:var(--ok)}
+.sthead{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bandtag{background:var(--panel2);color:var(--deep);font-family:var(--display);font-weight:800;padding:6px 12px;border-radius:4px;white-space:nowrap}
+.stage.now .bandtag{background:var(--sun);color:#fff}
+.sthead h3{font-size:1.2rem}
+.sthead .sub{margin-left:auto}
+.nowtag{font-size:.75rem;font-weight:700;color:var(--sun);text-transform:uppercase;letter-spacing:.05em}
+.goal{margin:12px 0 14px}
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.sk{background:var(--panel);border-left:4px solid var(--c);border-radius:4px;padding:10px 12px;font-size:.93rem}
+.sk b{display:block;color:var(--c);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.stmeta{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:10px}
+.stmeta div{border:1px dashed var(--line);border-radius:4px;padding:10px 12px;font-size:.93rem}
+.stmeta b{display:block;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.stage .btn{width:auto;margin-top:14px;padding:10px 16px}
 .hero .lnk,.mount .lnk{background:none;border:0;padding:0;color:var(--sun);font-weight:700}
 .side{padding-top:calc(14px + env(safe-area-inset-top))}.top{padding-top:calc(12px + env(safe-area-inset-top))}.pagehead,.sess{padding-top:calc(22px + env(safe-area-inset-top))}</style></head><body><div class="shell"><aside class="side" id="side"></aside><main class="main" id="main"><div class="wrap" id="app"></div></main></div><nav class="tabbar" id="tabbar" aria-label="Điều hướng"></nav><script>
 // w = từ, vi = nghĩa, ex = ví dụ, b = chủ đề
@@ -1044,9 +1048,11 @@ const ROAD=[
 ];
 function road(){mark('road');const cur=S.lv||1;
  $('#app').innerHTML=ph('Lộ trình 4.5 → 9.0','5 chặng, mỗi chặng có mục tiêu, việc cần làm cho từng kỹ năng, tài liệu và mốc kiểm tra bằng đề Cambridge IELTS 21. Thời gian là ước tính, tùy mỗi người.')+
- `<div class="road">${ROAD.map(r=>`<section class="stage ${r.lv===cur?'now':''}"><div class="bd">${LV[r.lv].replace(' → ','<br>→ ')}<small>Chặng ${r.lv}${r.lv===cur?' · bạn đang ở đây':''}</small></div><div><h3>${r.t}</h3><p class="sub" style="margin:0">${r.time}</p><p style="margin:10px 0 0">${r.goal}</p>
- <dl><dt>Nghe</dt><dd>${r.L}</dd><dt>Đọc</dt><dd>${r.R}</dd><dt>Viết</dt><dd>${r.W}</dd><dt>Nói</dt><dd>${r.S}</dd><dt>Tài liệu</dt><dd>${r.bk}</dd><dt>Mốc kiểm tra</dt><dd><b>${r.ck}</b></dd></dl>
- <button class="lnk" onclick="S.lv=${r.lv};save();learn()">${r.lv===cur?'Học từ vựng chặng này →':'Chuyển sang chặng này →'}</button></div></section>`).join('')}</div>`;toTop()}
+ `<div class="road">${ROAD.map(r=>`<section class="stage ${r.lv===cur?'now':r.lv<cur?'done':''}"><div class="sthead"><span class="bandtag">${LV[r.lv]}</span><h3>Chặng ${r.lv}: ${r.t}</h3>${r.lv===cur?'<span class="nowtag">Bạn đang ở đây</span>':''}<span class="sub">${r.time}</span></div>
+ <p class="goal">${r.goal}</p>
+ <div class="skills"><div class="sk" style="--c:var(--cL)"><b>Nghe</b>${r.L}</div><div class="sk" style="--c:var(--cR)"><b>Đọc</b>${r.R}</div><div class="sk" style="--c:var(--cW)"><b>Viết</b>${r.W}</div><div class="sk" style="--c:var(--cS)"><b>Nói</b>${r.S}</div></div>
+ <div class="stmeta"><div><b>Tài liệu</b>${r.bk}</div><div><b>Mốc kiểm tra</b>${r.ck}</div></div>
+ <button class="btn ${r.lv===cur?'':'ghost'}" onclick="S.lv=${r.lv};save();learn()">${r.lv===cur?'Học từ vựng chặng này':'Chuyển sang chặng này'}</button></section>`).join('')}</div>`;toTop()}
 // ---- Nạp file đáp án Cam 21 ----
 function bkFile(inp){const f=inp.files&&inp.files[0];if(!f)return;const rd=new FileReader();
  rd.onload=()=>{const K=bk();let n=0;String(rd.result).split(/^##\s*/m).slice(1).forEach(b=>{const lines=b.split('\n'),h=lines[0];
